@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Giriş Yap — İlan Platformu</title>
+  <link rel="stylesheet" href="/css/main.css" />
+</head>
+<body class="auth-sayfa">
+
+  <div class="auth-kart">
+    <a href="/index.html" class="auth-logo">🏠 İlan Platformu</a>
+
+    <!-- Sekme -->
+    <div class="auth-sekmeler">
+      <button class="sekme aktif" data-sekme="giris">Giriş Yap</button>
+      <button class="sekme" data-sekme="kayit">Kayıt Ol</button>
+    </div>
+
+    <!-- Giriş formu -->
+    <div id="giris-formu" class="auth-form">
+      <div class="form-grup">
+        <label for="giris-email">E-posta</label>
+        <input type="email" id="giris-email" placeholder="ornek@mail.com" />
+      </div>
+      <div class="form-grup">
+        <label for="giris-sifre">Şifre</label>
+        <input type="password" id="giris-sifre" placeholder="••••••••" />
+      </div>
+      <button id="giris-btn" class="btn-birincil tam">Giriş Yap</button>
+      <button id="sifre-sifirla-btn" class="btn-link">Şifremi unuttum</button>
+    </div>
+
+    <!-- Kayıt formu -->
+    <div id="kayit-formu" class="auth-form gizli">
+      <div class="form-grup">
+        <label for="kayit-ad">Ad Soyad</label>
+        <input type="text" id="kayit-ad" placeholder="Ad Soyad" />
+      </div>
+      <div class="form-grup">
+        <label for="kayit-email">E-posta</label>
+        <input type="email" id="kayit-email" placeholder="ornek@mail.com" />
+      </div>
+      <div class="form-grup">
+        <label for="kayit-telefon">Telefon</label>
+        <input type="tel" id="kayit-telefon" placeholder="05XX XXX XX XX" />
+      </div>
+      <div class="form-grup">
+        <label for="kayit-sehir">Şehir</label>
+        <input type="text" id="kayit-sehir" placeholder="İstanbul" />
+      </div>
+      <div class="form-grup">
+        <label for="kayit-sifre">Şifre</label>
+        <input type="password" id="kayit-sifre" placeholder="En az 6 karakter" />
+      </div>
+      <button id="kayit-btn" class="btn-birincil tam">Kayıt Ol</button>
+    </div>
+
+    <div id="auth-mesaj" class="auth-mesaj gizli"></div>
+  </div>
+
+  <script type="module">
+    import { girisYap, kayitOl, sifreSifirla, mevcutKullanici } from '/js/auth.js';
+
+    // Zaten giriş yapmışsa ana sayfaya yönlendir
+    mevcutKullanici().then(k => {
+      if (k) window.location.href = '/index.html';
+    });
+
+    // Sekme geçişi
+    document.querySelectorAll('.sekme').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sekme').forEach(b => b.classList.remove('aktif'));
+        btn.classList.add('aktif');
+        const hedef = btn.dataset.sekme;
+        document.getElementById('giris-formu').classList.toggle('gizli', hedef !== 'giris');
+        document.getElementById('kayit-formu').classList.toggle('gizli', hedef !== 'kayit');
+        mesajTemizle();
+      });
+    });
+
+    // Giriş
+    document.getElementById('giris-btn').addEventListener('click', async () => {
+      const email = document.getElementById('giris-email').value.trim();
+      const sifre = document.getElementById('giris-sifre').value;
+      if (!email || !sifre) return mesajGoster('E-posta ve şifre gerekli.', 'hata');
+      try {
+        yukleniyorAyarla('giris-btn', true);
+        await girisYap({ email, sifre });
+        window.location.href = '/index.html';
+      } catch (e) {
+        mesajGoster(hataMetni(e), 'hata');
+      } finally {
+        yukleniyorAyarla('giris-btn', false);
+      }
+    });
+
+    // Kayıt
+    document.getElementById('kayit-btn').addEventListener('click', async () => {
+      const adSoyad  = document.getElementById('kayit-ad').value.trim();
+      const email    = document.getElementById('kayit-email').value.trim();
+      const telefon  = document.getElementById('kayit-telefon').value.trim();
+      const sehir    = document.getElementById('kayit-sehir').value.trim();
+      const sifre    = document.getElementById('kayit-sifre').value;
+      if (!adSoyad || !email || !sifre) return mesajGoster('Ad, e-posta ve şifre zorunlu.', 'hata');
+      if (sifre.length < 6) return mesajGoster('Şifre en az 6 karakter olmalı.', 'hata');
+      try {
+        yukleniyorAyarla('kayit-btn', true);
+        await kayitOl({ email, sifre, adSoyad, telefon, sehir });
+        mesajGoster('Kaydınız alındı! E-postanızı onaylayın.', 'basari');
+      } catch (e) {
+        mesajGoster(hataMetni(e), 'hata');
+      } finally {
+        yukleniyorAyarla('kayit-btn', false);
+      }
+    });
+
+    // Şifre sıfırlama
+    document.getElementById('sifre-sifirla-btn').addEventListener('click', async () => {
+      const email = document.getElementById('giris-email').value.trim();
+      if (!email) return mesajGoster('Önce e-posta adresinizi girin.', 'hata');
+      try {
+        await sifreSifirla(email);
+        mesajGoster('Şifre sıfırlama bağlantısı gönderildi.', 'basari');
+      } catch (e) {
+        mesajGoster(hataMetni(e), 'hata');
+      }
+    });
+
+    function mesajGoster(metin, tip) {
+      const el = document.getElementById('auth-mesaj');
+      el.textContent = metin;
+      el.className = `auth-mesaj ${tip}`;
+    }
+    function mesajTemizle() {
+      document.getElementById('auth-mesaj').className = 'auth-mesaj gizli';
+    }
+    function yukleniyorAyarla(id, yukleniyor) {
+      document.getElementById(id).disabled = yukleniyor;
+      document.getElementById(id).textContent = yukleniyor ? 'Lütfen bekleyin...' : (id === 'giris-btn' ? 'Giriş Yap' : 'Kayıt Ol');
+    }
+    function hataMetni(e) {
+      const mesajlar = {
+        'Invalid login credentials': 'E-posta veya şifre hatalı.',
+        'User already registered': 'Bu e-posta adresi zaten kayıtlı.',
+        'Password should be at least 6 characters': 'Şifre en az 6 karakter olmalı.',
+        'Email not confirmed': 'E-posta adresinizi henüz onaylamadınız.'
+      };
+      return mesajlar[e.message] ?? e.message;
+    }
+  </script>
+</body>
+</html>
