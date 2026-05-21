@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>İlan Ver — İlan Platformu</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    .sayfa-baslik {
+      background: linear-gradient(135deg, #ede9fe 0%, #faf9ff 100%);
+      padding: 2rem 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .sayfa-baslik h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #1f2937;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+    .sayfa-baslik p {
+      color: #6b7280;
+      margin-top: .35rem;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .form-konteyner {
+      max-width: 760px;
+      margin: 2.5rem auto;
+      padding: 0 1.5rem 4rem;
+    }
+
+    .form-bolum {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin-bottom: 1.25rem;
+    }
+    .form-bolum-baslik {
+      font-size: 1rem;
+      font-weight: 700;
+      color: #1f2937;
+      margin-bottom: 1.25rem;
+      padding-bottom: .75rem;
+      border-bottom: 1px solid #f3f4f6;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+
+    /* Kategori seçici */
+    .kategori-secici {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: .625rem;
+    }
+    .kategori-kart {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: .4rem;
+      padding: .875rem .5rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 12px;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      font-size: .875rem;
+      font-weight: 600;
+      color: #374151;
+    }
+    .kategori-kart:hover { border-color: #a78bfa; background: #faf5ff; }
+    .kategori-kart.secili { border-color: var(--renk-birincil); background: #ede9fe; color: var(--renk-birincil); }
+    .kategori-kart .ikon { font-size: 1.75rem; }
+
+    /* Fotoğraf yükleme */
+    .fotograf-alani {
+      border: 2px dashed #d1d5db;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      position: relative;
+    }
+    .fotograf-alani:hover { border-color: var(--renk-birincil); background: #faf5ff; }
+    .fotograf-alani input { display: none; }
+    .fotograf-alani-ikon { font-size: 2.5rem; margin-bottom: .5rem; }
+    .fotograf-alani p { color: #6b7280; font-size: .9rem; }
+    .fotograf-alani span { color: var(--renk-birincil); font-weight: 600; }
+
+    .fotograf-onizlemeler {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: .75rem;
+      margin-top: 1rem;
+    }
+    .fotograf-onizleme {
+      position: relative;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .fotograf-onizleme img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .fotograf-sil-btn {
+      position: absolute;
+      top: 4px; right: 4px;
+      background: rgba(0,0,0,.6);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 24px; height: 24px;
+      font-size: .75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Fiyat alanı */
+    .fiyat-grup {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: .75rem;
+      align-items: end;
+    }
+
+    /* Konum */
+    .konum-grup {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: .75rem;
+    }
+
+    /* Gönder butonu */
+    .gonder-alani {
+      position: sticky;
+      bottom: 0;
+      background: #fff;
+      border-top: 1px solid #e5e7eb;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      z-index: 50;
+    }
+    .gonder-alani p { font-size: .875rem; color: #6b7280; }
+
+    @media (max-width: 600px) {
+      .kategori-secici { grid-template-columns: repeat(3, 1fr); }
+      .konum-grup { grid-template-columns: 1fr; }
+      .fiyat-grup { grid-template-columns: 1fr; }
+      .form-konteyner { padding: 0 1rem 5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-ic">
+      <a href="index.html" class="navbar-logo">🏠 İlan Platformu</a>
+      <div class="navbar-saglar">
+        <a href="index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">← Geri</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- BAŞLIK -->
+  <div class="sayfa-baslik">
+    <h1>📋 Yeni İlan Ver</h1>
+    <p>Hizmetini veya ürününü binlerce kişiye duyur.</p>
+  </div>
+
+  <!-- FORM -->
+  <div class="form-konteyner">
+
+    <!-- Kategori -->
+    <div class="form-bolum">
+      <div class="form-bolum-baslik">🏷️ Kategori Seç</div>
+      <div class="kategori-secici" id="kategori-secici">
+        <div class="yukleniyor-spinner" style="grid-column:1/-1"></div>
+      </div>
+      <input type="hidden" id="secili-kategori-id" />
+    </div>
+
+    <!-- Temel bilgiler -->
+    <div class="form-bolum">
+      <div class="form-bolum-baslik">📝 İlan Bilgileri</div>
+      <div class="form-grup">
+        <label for="baslik">Başlık <span style="color:#ef4444">*</span></label>
+        <input type="text" id="baslik" placeholder="örn. Matematik özel ders veriyorum" maxlength="100" />
+        <span style="font-size:.75rem;color:#9ca3af" id="baslik-sayac">0/100</span>
+      </div>
+      <div class="form-grup">
+        <label for="aciklama">Açıklama <span style="color:#ef4444">*</span></label>
+        <textarea id="aciklama" rows="5"
+          placeholder="Kendin ve sunduğun hizmet hakkında detaylı bilgi ver. Deneyim, uygunluk, fiyatlandırma gibi bilgileri paylaşabilirsin."></textarea>
+      </div>
+    </div>
+
+    <!-- Fiyat -->
+    <div class="form-bolum">
+      <div class="form-bolum-baslik">💰 Fiyat</div>
+      <div class="fiyat-grup">
+        <div class="form-grup" style="margin:0">
+          <label for="fiyat">Fiyat (boş bırakırsan "Fiyat sorulur" yazar)</label>
+          <input type="number" id="fiyat" placeholder="0" min="0" />
+        </div>
+        <div class="form-grup" style="margin:0">
+          <label for="fiyat-birimi">Birim</label>
+          <select id="fiyat-birimi">
+            <option value="TL">TL</option>
+            <option value="TL/saat">TL/saat</option>
+            <option value="TL/gün">TL/gün</option>
+            <option value="TL/ay">TL/ay</option>
+            <option value="TL/seans">TL/seans</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Konum -->
+    <div class="form-bolum">
+      <div class="form-bolum-baslik">📍 Konum</div>
+      <div class="konum-grup">
+        <div class="form-grup" style="margin:0">
+          <label for="sehir">Şehir <span style="color:#ef4444">*</span></label>
+          <input type="text" id="sehir" placeholder="İstanbul" />
+        </div>
+        <div class="form-grup" style="margin:0">
+          <label for="ilce">İlçe</label>
+          <input type="text" id="ilce" placeholder="Kadıköy" />
+        </div>
+      </div>
+    </div>
+
+    <!-- Fotoğraflar -->
+    <div class="form-bolum">
+      <div class="form-bolum-baslik">📷 Fotoğraflar (isteğe bağlı)</div>
+      <div class="fotograf-alani" id="fotograf-alani">
+        <input type="file" id="fotograf-input" accept="image/jpeg,image/png,image/webp" multiple />
+        <div class="fotograf-alani-ikon">🖼️</div>
+        <p><span>Fotoğraf seç</span> veya buraya sürükle bırak</p>
+        <p style="font-size:.8rem;margin-top:.25rem">JPG, PNG, WEBP — max 5MB</p>
+      </div>
+      <div class="fotograf-onizlemeler" id="fotograf-onizlemeler"></div>
+    </div>
+
+  </div>
+
+  <!-- GÖNDER -->
+  <div class="gonder-alani">
+    <p>* zorunlu alanlar</p>
+    <button id="gonder-btn" class="btn-birincil" style="padding:.75rem 2rem">
+      İlanı Yayınla
+    </button>
+  </div>
+
+  <script type="module">
+    import { kategorileriGetir, ilanOlustur } from './js/ilanlar.js';
+    import { mevcutKullanici }                from './js/auth.js';
+    import { toastBasari, toastHata, btnYukleniyor } from './js/ui.js';
+    import { supabase }                       from './js/config.js';
+
+    // Giriş kontrolü
+    const kullanici = await mevcutKullanici();
+    if (!kullanici) {
+      window.location.href = 'giris.html?sonra=ilan-ver.html';
+    }
+
+    // Seçili fotoğraflar
+    let fotograflar = [];
+
+    // ── Kategorileri yükle ──────────────────────────────────
+    const kategoriler = await kategorileriGetir();
+    const secici = document.getElementById('kategori-secici');
+    secici.innerHTML = '';
+    kategoriler.forEach(k => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'kategori-kart';
+      btn.dataset.id = k.id;
+      btn.innerHTML = `<span class="ikon">${k.ikon ?? '📋'}</span>${k.ad}`;
+      btn.addEventListener('click', () => {
+        secici.querySelectorAll('.kategori-kart').forEach(b => b.classList.remove('secili'));
+        btn.classList.add('secili');
+        document.getElementById('secili-kategori-id').value = k.id;
+      });
+      secici.appendChild(btn);
+    });
+
+    // ── Başlık sayacı ───────────────────────────────────────
+    document.getElementById('baslik').addEventListener('input', function() {
+      document.getElementById('baslik-sayac').textContent = `${this.value.length}/100`;
+    });
+
+    // ── Fotoğraf yükleme ────────────────────────────────────
+    const fotografAlani  = document.getElementById('fotograf-alani');
+    const fotografInput  = document.getElementById('fotograf-input');
+    const onizlemeler    = document.getElementById('fotograf-onizlemeler');
+
+    fotografAlani.addEventListener('click', () => fotografInput.click());
+    fotografAlani.addEventListener('dragover', e => { e.preventDefault(); fotografAlani.style.borderColor = '#7c3aed'; });
+    fotografAlani.addEventListener('dragleave', () => { fotografAlani.style.borderColor = '#d1d5db'; });
+    fotografAlani.addEventListener('drop', e => {
+      e.preventDefault();
+      fotografAlani.style.borderColor = '#d1d5db';
+      dosyalariEkle([...e.dataTransfer.files]);
+    });
+    fotografInput.addEventListener('change', () => dosyalariEkle([...fotografInput.files]));
+
+    function dosyalariEkle(dosyalar) {
+      dosyalar.forEach(dosya => {
+        if (!dosya.type.startsWith('image/')) return;
+        if (dosya.size > 5 * 1024 * 1024) { toastHata(`${dosya.name} 5MB'dan büyük.`); return; }
+        if (fotograflar.length >= 5) { toastHata('En fazla 5 fotoğraf ekleyebilirsin.'); return; }
+        fotograflar.push(dosya);
+        const reader = new FileReader();
+        reader.onload = e => {
+          const div = document.createElement('div');
+          div.className = 'fotograf-onizleme';
+          div.innerHTML = `
+            <img src="${e.target.result}" alt="önizleme" />
+            <button class="fotograf-sil-btn" data-index="${fotograflar.length - 1}">✕</button>
+          `;
+          div.querySelector('.fotograf-sil-btn').addEventListener('click', (ev) => {
+            const idx = parseInt(ev.target.dataset.index);
+            fotograflar.splice(idx, 1);
+            div.remove();
+            // index'leri güncelle
+            onizlemeler.querySelectorAll('.fotograf-sil-btn').forEach((b, i) => b.dataset.index = i);
+          });
+          onizlemeler.appendChild(div);
+        };
+        reader.readAsDataURL(dosya);
+      });
+    }
+
+    // ── Fotoğrafları Supabase Storage'a yükle ───────────────
+    async function fotograflariYukle(ilanId) {
+      const urller = [];
+      for (let i = 0; i < fotograflar.length; i++) {
+        const dosya  = fotograflar[i];
+        const uzanti = dosya.name.split('.').pop();
+        const yol    = `${kullanici.id}/${ilanId}/${i}.${uzanti}`;
+        const { error } = await supabase.storage
+          .from('ilan-fotograflari')
+          .upload(yol, dosya, { upsert: true });
+        if (error) throw error;
+        const { data } = supabase.storage.from('ilan-fotograflari').getPublicUrl(yol);
+        urller.push({ url: data.publicUrl, sira: i });
+      }
+      // Fotoğraf URL'lerini veritabanına kaydet
+      if (urller.length > 0) {
+        const { error } = await supabase.from('ilan_fotograflari').insert(
+          urller.map(u => ({ ilan_id: ilanId, url: u.url, sira: u.sira }))
+        );
+        if (error) throw error;
+      }
+    }
+
+    // ── İlanı gönder ────────────────────────────────────────
+    const gonderBtn = document.getElementById('gonder-btn');
+    gonderBtn.addEventListener('click', async () => {
+      const kategoriId  = document.getElementById('secili-kategori-id').value;
+      const baslik      = document.getElementById('baslik').value.trim();
+      const aciklama    = document.getElementById('aciklama').value.trim();
+      const fiyat       = document.getElementById('fiyat').value;
+      const fiyatBirimi = document.getElementById('fiyat-birimi').value;
+      const sehir       = document.getElementById('sehir').value.trim();
+      const ilce        = document.getElementById('ilce').value.trim();
+
+      // Doğrulama
+      if (!kategoriId) return toastHata('Lütfen bir kategori seçin.');
+      if (!baslik)     return toastHata('Başlık zorunludur.');
+      if (!aciklama)   return toastHata('Açıklama zorunludur.');
+      if (!sehir)      return toastHata('Şehir zorunludur.');
+
+      try {
+        btnYukleniyor(gonderBtn, true, 'İlanı Yayınla');
+        const ilan = await ilanOlustur({ kategoriId, baslik, aciklama, fiyat, fiyatBirimi, sehir, ilce });
+        if (fotograflar.length > 0) await fotograflariYukle(ilan.id);
+        toastBasari('İlanın yayınlandı! 🎉');
+        setTimeout(() => { window.location.href = `ilan-detay.html?id=${ilan.id}`; }, 1200);
+      } catch (e) {
+        console.error(e);
+        toastHata('Bir hata oluştu: ' + e.message);
+      } finally {
+        btnYukleniyor(gonderBtn, false, 'İlanı Yayınla');
+      }
+    });
+  </script>
+</body>
+</html>
