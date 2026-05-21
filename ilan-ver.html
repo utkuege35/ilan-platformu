@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="css/main.css" />
   <style>
     .sayfa-baslik {
-      background: linear-gradient(135deg, #ede9fe 0%, #faf9ff 100%);
+      background: linear-gradient(135deg, #e0f2fe 0%, #faf9ff 100%);
       padding: 2rem 1.5rem;
       border-bottom: 1px solid #e5e7eb;
     }
@@ -72,8 +72,8 @@
       font-weight: 600;
       color: #374151;
     }
-    .kategori-kart:hover { border-color: #a78bfa; background: #faf5ff; }
-    .kategori-kart.secili { border-color: var(--renk-birincil); background: #ede9fe; color: var(--renk-birincil); }
+    .kategori-kart:hover { border-color: #38bdf8; background: #faf5ff; }
+    .kategori-kart.secili { border-color: var(--renk-birincil); background: #e0f2fe; color: var(--renk-birincil); }
     .kategori-kart .ikon { font-size: 1.75rem; }
 
     /* Fotoğraf yükleme */
@@ -308,7 +308,7 @@
     const onizlemeler    = document.getElementById('fotograf-onizlemeler');
 
     fotografAlani.addEventListener('click', () => fotografInput.click());
-    fotografAlani.addEventListener('dragover', e => { e.preventDefault(); fotografAlani.style.borderColor = '#7c3aed'; });
+    fotografAlani.addEventListener('dragover', e => { e.preventDefault(); fotografAlani.style.borderColor = '#0ea5e9'; });
     fotografAlani.addEventListener('dragleave', () => { fotografAlani.style.borderColor = '#d1d5db'; });
     fotografAlani.addEventListener('drop', e => {
       e.preventDefault();
