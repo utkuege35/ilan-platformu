@@ -4,12 +4,12 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Giriş Yap — İlan Platformu</title>
-  <link rel="stylesheet" href="/css/main.css" />
+  <link rel="stylesheet" href="css/main.css" />
 </head>
 <body class="auth-sayfa">
 
   <div class="auth-kart">
-    <a href="/index.html" class="auth-logo">🏠 İlan Platformu</a>
+    <a href="index.html" class="auth-logo">🏠 İlan Platformu</a>
 
     <!-- Sekme -->
     <div class="auth-sekmeler">
@@ -60,11 +60,11 @@
   </div>
 
   <script type="module">
-    import { girisYap, kayitOl, sifreSifirla, mevcutKullanici } from '/js/auth.js';
+    import { girisYap, kayitOl, sifreSifirla, mevcutKullanici } from './js/auth.js';
 
     // Zaten giriş yapmışsa ana sayfaya yönlendir
     mevcutKullanici().then(k => {
-      if (k) window.location.href = '/index.html';
+      if (k) window.location.href = 'index.html';
     });
 
     // Sekme geçişi
@@ -87,7 +87,7 @@
       try {
         yukleniyorAyarla('giris-btn', true);
         await girisYap({ email, sifre });
-        window.location.href = '/index.html';
+        window.location.href = 'index.html';
       } catch (e) {
         mesajGoster(hataMetni(e), 'hata');
       } finally {
