@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>İlan Detay — İlan Platformu</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    .detay-konteyner {
+      max-width: 1100px;
+      margin: 2rem auto;
+      padding: 0 1.5rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 1.75rem;
+      align-items: start;
+    }
+
+    /* ── Sol kolon ─────────────────────────────────────────── */
+    .detay-sol { min-width: 0; }
+
+    /* Fotoğraf galerisi */
+    .galeri {
+      border-radius: 16px;
+      overflow: hidden;
+      background: #f3f4f6;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    .galeri-ana {
+      aspect-ratio: 16/9;
+      overflow: hidden;
+    }
+    .galeri-ana img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      cursor: zoom-in;
+    }
+    .galeri-ana-yok {
+      width: 100%; height: 100%;
+      min-height: 240px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 5rem;
+      background: #e0f2fe;
+    }
+    .galeri-kucukler {
+      display: flex;
+      gap: .5rem;
+      padding: .5rem;
+      overflow-x: auto;
+    }
+    .galeri-kucukler img {
+      width: 72px; height: 54px;
+      object-fit: cover;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: border-color .2s;
+      flex-shrink: 0;
+    }
+    .galeri-kucukler img.aktif { border-color: var(--renk-birincil); }
+
+    /* İlan bilgileri */
+    .ilan-baslik-alani {
+      margin-bottom: 1.25rem;
+    }
+    .ilan-kategori-etiket {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      background: #e0f2fe;
+      color: #0284c7;
+      padding: .3rem .75rem;
+      border-radius: 99px;
+      font-size: .8rem;
+      font-weight: 600;
+      margin-bottom: .75rem;
+    }
+    .ilan-baslik {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #1f2937;
+      line-height: 1.3;
+      margin-bottom: .75rem;
+    }
+    .ilan-meta-satir {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      font-size: .875rem;
+      color: #6b7280;
+    }
+    .ilan-meta-satir span {
+      display: flex;
+      align-items: center;
+      gap: .3rem;
+    }
+
+    /* Açıklama */
+    .aciklama-kutu {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .aciklama-kutu h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: .875rem;
+      color: #1f2937;
+    }
+    .aciklama-metin {
+      color: #374151;
+      line-height: 1.75;
+      white-space: pre-wrap;
+      font-size: .95rem;
+    }
+
+    /* ── Sağ kolon ─────────────────────────────────────────── */
+    .detay-sag { position: sticky; top: 80px; }
+
+    .fiyat-kutu {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .fiyat-buyuk {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--renk-birincil);
+      margin-bottom: 1rem;
+    }
+    .fiyat-buyuk span {
+      font-size: 1rem;
+      font-weight: 500;
+      color: #6b7280;
+    }
+
+    /* Mesaj formu */
+    .mesaj-formu textarea {
+      width: 100%;
+      padding: .75rem;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      font-size: .9rem;
+      resize: none;
+      outline: none;
+      font-family: inherit;
+      transition: border-color .2s;
+      margin-bottom: .75rem;
+    }
+    .mesaj-formu textarea:focus { border-color: var(--renk-birincil); }
+
+    /* Satıcı kartı */
+    .satici-kutu {
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+    .satici-kutu h3 {
+      font-size: .875rem;
+      font-weight: 700;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: 1rem;
+    }
+    .satici-profil {
+      display: flex;
+      align-items: center;
+      gap: .875rem;
+      margin-bottom: 1rem;
+    }
+    .satici-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      background: #e0f2fe;
+      color: var(--renk-birincil);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 700;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .satici-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .satici-ad { font-size: 1rem; font-weight: 700; color: #1f2937; }
+    .satici-sehir { font-size: .825rem; color: #6b7280; }
+    .satici-iletisim {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      margin-top: .75rem;
+      padding-top: .75rem;
+      border-top: 1px solid #f3f4f6;
+    }
+    .satici-iletisim a {
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+      font-size: .875rem;
+      color: #374151;
+      text-decoration: none;
+      padding: .5rem .75rem;
+      border-radius: 8px;
+      background: #f9fafb;
+      transition: background .2s;
+    }
+    .satici-iletisim a:hover { background: #e0f2fe; }
+
+    /* Yükleniyor / hata */
+    .yukleniyor-alani { padding: 4rem 0; }
+
+    /* Mobil */
+    @media (max-width: 768px) {
+      .detay-konteyner {
+        grid-template-columns: 1fr;
+        margin: 1rem auto;
+        padding: 0 1rem 4rem;
+        gap: 1rem;
+      }
+      .detay-sag { position: static; }
+      .ilan-baslik { font-size: 1.35rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-ic">
+      <a href="index.html" class="navbar-logo">🏠 İlan Platformu</a>
+      <div class="navbar-saglar">
+        <a href="index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">← Geri</a>
+        <a href="giris.html" class="btn-birincil" id="nav-giris" style="font-size:.875rem;padding:.5rem 1rem">Giriş Yap</a>
+        <div class="nav-kullanici gizli" id="nav-kullanici">
+          <div class="nav-avatar" id="nav-avatar">?</div>
+          <span id="nav-kullanici-ad"></span>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- İÇERİK -->
+  <div id="ilan-yukleniyor" class="konteyner yukleniyor-alani">
+    <div class="yukleniyor-spinner"></div>
+  </div>
+
+  <div id="ilan-icerik" class="detay-konteyner" style="display:none">
+
+    <!-- SOL: Fotoğraf + Bilgiler -->
+    <div class="detay-sol">
+
+      <div class="galeri" id="galeri">
+        <div class="galeri-ana" id="galeri-ana"></div>
+        <div class="galeri-kucukler" id="galeri-kucukler" style="display:none"></div>
+      </div>
+
+      <div class="ilan-baslik-alani">
+        <div class="ilan-kategori-etiket" id="kategori-etiket"></div>
+        <h1 class="ilan-baslik" id="ilan-baslik"></h1>
+        <div class="ilan-meta-satir">
+          <span>📍 <span id="ilan-konum"></span></span>
+          <span>👁 <span id="ilan-goruntuleme"></span> görüntülenme</span>
+          <span>🕐 <span id="ilan-tarih"></span></span>
+        </div>
+      </div>
+
+      <div class="aciklama-kutu">
+        <h3>📋 Açıklama</h3>
+        <div class="aciklama-metin" id="ilan-aciklama"></div>
+      </div>
+
+    </div>
+
+    <!-- SAĞ: Fiyat + Mesaj + Satıcı -->
+    <div class="detay-sag">
+
+      <!-- Fiyat & Mesaj -->
+      <div class="fiyat-kutu">
+        <div class="fiyat-buyuk" id="ilan-fiyat"></div>
+
+        <!-- Kendi ilanıysa düzenle butonu -->
+        <div id="kendi-ilan-alani" style="display:none">
+          <a id="duzenle-btn" href="#" class="btn-ikincil tam" style="margin-bottom:.75rem;display:flex;justify-content:center">✏️ İlanı Düzenle</a>
+          <button id="pasif-btn" class="btn-link tam" style="text-align:center;color:#ef4444">İlanı Pasife Al</button>
+        </div>
+
+        <!-- Başkasının ilanıysa mesaj formu -->
+        <div id="mesaj-alani" class="mesaj-formu">
+          <textarea id="mesaj-icerik" rows="4"
+            placeholder="Merhaba, ilanınızla ilgili bilgi almak istiyorum..."></textarea>
+          <button id="mesaj-gonder-btn" class="btn-birincil tam">💬 Mesaj Gönder</button>
+          <p style="font-size:.75rem;color:#9ca3af;text-align:center;margin-top:.5rem">
+            Mesaj göndermek için giriş yapmanız gerekir.
+          </p>
+        </div>
+      </div>
+
+      <!-- Satıcı Kartı -->
+      <div class="satici-kutu">
+        <h3>İlan Sahibi</h3>
+        <div class="satici-profil">
+          <div class="satici-avatar" id="satici-avatar"></div>
+          <div>
+            <div class="satici-ad" id="satici-ad"></div>
+            <div class="satici-sehir" id="satici-sehir"></div>
+          </div>
+        </div>
+        <div class="satici-iletisim" id="satici-iletisim"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="ilan-hata" class="konteyner" style="display:none;padding:4rem 1.5rem">
+    <div class="bos-durum">
+      <div class="bos-durum-ikon">😕</div>
+      <h3>İlan bulunamadı</h3>
+      <p>Bu ilan kaldırılmış veya mevcut değil.</p>
+      <a href="index.html" class="btn-birincil" style="display:inline-flex;margin-top:1rem">Ana Sayfaya Dön</a>
+    </div>
+  </div>
+
+  <script type="module">
+    import { ilanGetir }                              from './js/ilanlar.js';
+    import { mevcutKullanici, navbarGuncelle, cikisYap } from './js/auth.js';
+    import { fiyatFormatla, tarihFormatla, toastBasari, toastHata, toastBilgi } from './js/ui.js';
+    import { supabase }                               from './js/config.js';
+
+    const params  = new URLSearchParams(window.location.search);
+    const ilanId  = params.get('id');
+
+    navbarGuncelle();
+
+    if (!ilanId) {
+      document.getElementById('ilan-yukleniyor').style.display = 'none';
+      document.getElementById('ilan-hata').style.display = 'block';
+    } else {
+      yukle();
+    }
+
+    async function yukle() {
+      try {
+        const [ilan, kullanici] = await Promise.all([
+          ilanGetir(ilanId),
+          mevcutKullanici()
+        ]);
+
+        document.title = `${ilan.baslik} — İlan Platformu`;
+        document.getElementById('ilan-yukleniyor').style.display = 'none';
+        document.getElementById('ilan-icerik').style.display = 'grid';
+
+        // Fotoğraflar
+        const fotograflar = ilan.ilan_fotograflari ?? [];
+        const galeriAna   = document.getElementById('galeri-ana');
+        const galeriKucuk = document.getElementById('galeri-kucukler');
+
+        if (fotograflar.length > 0) {
+          galeriAna.innerHTML = `<img id="ana-foto" src="${fotograflar[0].url}" alt="${ilan.baslik}" />`;
+          if (fotograflar.length > 1) {
+            galeriKucuk.style.display = 'flex';
+            fotograflar.forEach((f, i) => {
+              const img = document.createElement('img');
+              img.src = f.url;
+              img.alt = `Fotoğraf ${i+1}`;
+              if (i === 0) img.classList.add('aktif');
+              img.addEventListener('click', () => {
+                document.getElementById('ana-foto').src = f.url;
+                galeriKucuk.querySelectorAll('img').forEach(x => x.classList.remove('aktif'));
+                img.classList.add('aktif');
+              });
+              galeriKucuk.appendChild(img);
+            });
+          }
+        } else {
+          galeriAna.innerHTML = `<div class="galeri-ana-yok">${ilan.kategoriler?.ikon ?? '📋'}</div>`;
+        }
+
+        // Başlık ve meta
+        document.getElementById('kategori-etiket').innerHTML =
+          `${ilan.kategoriler?.ikon ?? ''} ${ilan.kategoriler?.ad ?? ''}`;
+        document.getElementById('ilan-baslik').textContent     = ilan.baslik;
+        document.getElementById('ilan-konum').textContent      = ilan.ilce ? `${ilan.ilce}, ${ilan.sehir}` : ilan.sehir;
+        document.getElementById('ilan-goruntuleme').textContent = ilan.goruntuleme;
+        document.getElementById('ilan-tarih').textContent      = tarihFormatla(ilan.created_at);
+        document.getElementById('ilan-aciklama').textContent   = ilan.aciklama;
+        document.getElementById('ilan-fiyat').innerHTML =
+          `${fiyatFormatla(ilan.fiyat, ilan.fiyat_birimi)}`;
+
+        // Satıcı
+        const profil = ilan.profiles;
+        const avatarEl = document.getElementById('satici-avatar');
+        if (profil.avatar_url) {
+          avatarEl.innerHTML = `<img src="${profil.avatar_url}" alt="${profil.ad_soyad}" />`;
+        } else {
+          avatarEl.textContent = profil.ad_soyad?.charAt(0)?.toUpperCase() ?? '?';
+        }
+        document.getElementById('satici-ad').textContent    = profil.ad_soyad;
+        document.getElementById('satici-sehir').textContent = profil.sehir ?? '';
+
+        // İletişim bilgisi (sadece giriş yapılmışsa göster)
+        const iletisimEl = document.getElementById('satici-iletisim');
+        if (kullanici && profil.telefon) {
+          iletisimEl.innerHTML = `
+            <a href="tel:${profil.telefon}">📞 ${profil.telefon}</a>
+          `;
+        } else if (!kullanici) {
+          iletisimEl.innerHTML = `
+            <p style="font-size:.8rem;color:#9ca3af;text-align:center">
+              İletişim bilgisini görmek için <a href="giris.html">giriş yapın</a>.
+            </p>`;
+        }
+
+        // Kendi ilanı mı?
+        if (kullanici && kullanici.id === ilan.user_id) {
+          document.getElementById('kendi-ilan-alani').style.display = 'block';
+          document.getElementById('mesaj-alani').style.display      = 'none';
+          document.getElementById('duzenle-btn').href = `ilan-ver.html?duzenle=${ilan.id}`;
+          document.getElementById('pasif-btn').addEventListener('click', async () => {
+            if (!confirm('İlanı pasife almak istediğine emin misin?')) return;
+            try {
+              const { ilanPasifYap } = await import('./js/ilanlar.js');
+              await ilanPasifYap(ilanId);
+              toastBasari('İlan pasife alındı.');
+              setTimeout(() => window.location.href = 'index.html', 1200);
+            } catch(e) { toastHata(e.message); }
+          });
+        }
+
+        // Mesaj gönder
+        document.getElementById('mesaj-gonder-btn').addEventListener('click', async () => {
+          if (!kullanici) {
+            toastBilgi('Mesaj göndermek için giriş yapmalısınız.');
+            setTimeout(() => window.location.href = `giris.html?sonra=ilan-detay.html?id=${ilanId}`, 1000);
+            return;
+          }
+          const icerik = document.getElementById('mesaj-icerik').value.trim();
+          if (!icerik) { toastHata('Mesaj boş olamaz.'); return; }
+
+          const btn = document.getElementById('mesaj-gonder-btn');
+          btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+          try {
+            await mesajGonder(kullanici.id, ilan.user_id, ilanId, icerik);
+            toastBasari('Mesajın gönderildi! 🎉');
+            document.getElementById('mesaj-icerik').value = '';
+            setTimeout(() => window.location.href = 'mesajlar.html', 1200);
+          } catch(e) {
+            toastHata('Mesaj gönderilemedi: ' + e.message);
+          } finally {
+            btn.disabled = false; btn.textContent = '💬 Mesaj Gönder';
+          }
+        });
+
+      } catch(e) {
+        console.error(e);
+        document.getElementById('ilan-yukleniyor').style.display = 'none';
+        document.getElementById('ilan-hata').style.display = 'block';
+      }
+    }
+
+    // ── Mesaj gönderme (konuşma yoksa oluştur) ──────────────
+    async function mesajGonder(gondeId, aliciId, ilanId, icerik) {
+      // Konuşmayı bul veya oluştur (upsert)
+      const { data: konusma, error: kErr } = await supabase
+        .from('konusmalar')
+        .upsert(
+          { ilan_id: ilanId, ilan_sahibi: aliciId, mesajci: gondeId, son_mesaj: icerik },
+          { onConflict: 'ilan_id,mesajci', ignoreDuplicates: false }
+        )
+        .select()
+        .single();
+      if (kErr) throw kErr;
+
+      // Mesajı ekle
+      const { error: mErr } = await supabase
+        .from('mesajlar')
+        .insert({ konusma_id: konusma.id, gonderen_id: gondeId, icerik });
+      if (mErr) throw mErr;
+    }
+  </script>
+</body>
+</html>
