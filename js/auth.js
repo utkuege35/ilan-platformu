@@ -87,7 +87,7 @@ export async function profilGuncelle(userId, guncellemeler) {
 // ── Şifre sıfırlama maili ────────────────────────────────
 export async function sifreSifirla(email) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${window.location.origin}/giris.html?mod=sifre-guncelle`
+    redirectTo: `${window.location.origin}/ilan-platformu/giris.html?mod=sifre-guncelle`
   });
   if (error) throw error;
 }
