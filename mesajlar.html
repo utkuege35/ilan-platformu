@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mesajlar — İlan Platformu</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    .inbox-sayfa {
+      max-width: 1100px;
+      margin: 0 auto;
+      height: calc(100vh - 64px);
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      border-left: 1px solid #e5e7eb;
+      border-right: 1px solid #e5e7eb;
+    }
+
+    /* ── Sol: Konuşma listesi ─────────────────────────────── */
+    .konusma-listesi {
+      border-right: 1px solid #e5e7eb;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      background: #fff;
+    }
+    .konusma-listesi-baslik {
+      padding: 1.25rem 1.25rem .875rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #1f2937;
+      border-bottom: 1px solid #f3f4f6;
+      flex-shrink: 0;
+    }
+    .konusma-listesi-ic {
+      overflow-y: auto;
+      flex: 1;
+    }
+    .konusma-item {
+      display: flex;
+      align-items: center;
+      gap: .875rem;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      border-bottom: 1px solid #f9fafb;
+      transition: background .15s;
+      position: relative;
+    }
+    .konusma-item:hover { background: #f0f9ff; }
+    .konusma-item.aktif { background: #e0f2fe; }
+    .konusma-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: #e0f2fe;
+      color: var(--renk-birincil);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: .9rem;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .konusma-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .konusma-bilgi { flex: 1; min-width: 0; }
+    .konusma-ad {
+      font-size: .9rem;
+      font-weight: 600;
+      color: #1f2937;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .konusma-ilan {
+      font-size: .75rem;
+      color: #0ea5e9;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: .15rem;
+    }
+    .konusma-son-mesaj {
+      font-size: .8rem;
+      color: #6b7280;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .konusma-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: .35rem;
+      flex-shrink: 0;
+    }
+    .konusma-tarih { font-size: .7rem; color: #9ca3af; }
+    .okunmamis-rozet {
+      background: var(--renk-birincil);
+      color: #fff;
+      border-radius: 99px;
+      padding: .1rem .45rem;
+      font-size: .7rem;
+      font-weight: 700;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    /* ── Sağ: Mesaj alanı ─────────────────────────────────── */
+    .mesaj-alani {
+      display: flex;
+      flex-direction: column;
+      background: #f9fafb;
+      overflow: hidden;
+    }
+
+    /* Başlık */
+    .mesaj-baslik {
+      background: #fff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 1rem 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: .875rem;
+      flex-shrink: 0;
+    }
+    .mesaj-baslik-avatar {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: #e0f2fe;
+      color: var(--renk-birincil);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .mesaj-baslik-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .mesaj-baslik-bilgi { flex: 1; min-width: 0; }
+    .mesaj-baslik-ad { font-weight: 700; font-size: .95rem; color: #1f2937; }
+    .mesaj-baslik-ilan {
+      font-size: .8rem; color: #6b7280;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+
+    /* Mesaj listesi */
+    .mesaj-listesi {
+      flex: 1;
+      overflow-y: auto;
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: .625rem;
+    }
+    .mesaj-balonu {
+      max-width: 68%;
+      display: flex;
+      flex-direction: column;
+      gap: .2rem;
+    }
+    .mesaj-balonu.benim { align-self: flex-end; align-items: flex-end; }
+    .mesaj-balonu.karsi { align-self: flex-start; align-items: flex-start; }
+    .balon-icerik {
+      padding: .625rem .875rem;
+      border-radius: 16px;
+      font-size: .9rem;
+      line-height: 1.5;
+      word-break: break-word;
+    }
+    .mesaj-balonu.benim .balon-icerik {
+      background: var(--renk-birincil);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+    }
+    .mesaj-balonu.karsi .balon-icerik {
+      background: #fff;
+      color: #1f2937;
+      border: 1px solid #e5e7eb;
+      border-bottom-left-radius: 4px;
+    }
+    .balon-tarih {
+      font-size: .7rem;
+      color: #9ca3af;
+      padding: 0 .25rem;
+    }
+
+    /* Giriş alanı */
+    .mesaj-gir-alani {
+      background: #fff;
+      border-top: 1px solid #e5e7eb;
+      padding: .875rem 1.25rem;
+      display: flex;
+      gap: .625rem;
+      align-items: flex-end;
+      flex-shrink: 0;
+    }
+    .mesaj-gir-alani textarea {
+      flex: 1;
+      padding: .65rem .875rem;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 12px;
+      font-size: .9rem;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      max-height: 120px;
+      transition: border-color .2s;
+    }
+    .mesaj-gir-alani textarea:focus { border-color: var(--renk-birincil); }
+    .mesaj-gonder-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: var(--renk-birincil);
+      color: #fff;
+      border: none;
+      font-size: 1.1rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background .2s;
+      flex-shrink: 0;
+    }
+    .mesaj-gonder-btn:hover { background: #0284c7; }
+    .mesaj-gonder-btn:disabled { opacity: .5; cursor: not-allowed; }
+
+    /* Boş seçim */
+    .bos-secim {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      color: #9ca3af;
+      gap: .75rem;
+    }
+    .bos-secim-ikon { font-size: 3.5rem; }
+
+    /* Mobil */
+    @media (max-width: 768px) {
+      .inbox-sayfa {
+        grid-template-columns: 1fr;
+        height: auto;
+        min-height: calc(100vh - 64px);
+      }
+      .konusma-listesi {
+        border-right: none;
+        border-bottom: 1px solid #e5e7eb;
+        max-height: 40vh;
+      }
+      .mesaj-alani { min-height: 60vh; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-ic">
+      <a href="index.html" class="navbar-logo">🏠 İlan Platformu</a>
+      <div class="navbar-saglar">
+        <a href="index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">← Geri</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="inbox-sayfa">
+
+    <!-- Konuşma listesi -->
+    <div class="konusma-listesi">
+      <div class="konusma-listesi-baslik">💬 Mesajlar</div>
+      <div class="konusma-listesi-ic" id="konusma-listesi-ic">
+        <div class="yukleniyor-spinner"></div>
+      </div>
+    </div>
+
+    <!-- Mesaj alanı -->
+    <div class="mesaj-alani" id="mesaj-alani">
+      <div class="bos-secim">
+        <div class="bos-secim-ikon">💬</div>
+        <p>Bir konuşma seç</p>
+      </div>
+    </div>
+
+  </div>
+
+  <script type="module">
+    import { konusmalariGetir, mesajlariGetir, mesajGonder, okunduYap, mesajlariDinle } from './js/mesajlar.js';
+    import { mevcutKullanici }    from './js/auth.js';
+    import { tarihFormatla }      from './js/ui.js';
+    import { supabase }           from './js/config.js';
+
+    // Giriş kontrolü
+    const kullanici = await mevcutKullanici();
+    if (!kullanici) {
+      window.location.href = 'giris.html?sonra=mesajlar.html';
+    }
+
+    let aktifKonusmaId  = null;
+    let aktifKanal      = null;
+    const params        = new URLSearchParams(window.location.search);
+    const hedefKonusma  = params.get('konusma');
+
+    // ── Konuşmaları yükle ───────────────────────────────────
+    async function konusmalariYukle() {
+      const liste = document.getElementById('konusma-listesi-ic');
+      try {
+        const konusmalar = await konusmalariGetir(kullanici.id);
+        liste.innerHTML = '';
+
+        if (konusmalar.length === 0) {
+          liste.innerHTML = `
+            <div style="padding:2rem 1.25rem;text-align:center;color:#9ca3af;font-size:.875rem">
+              Henüz mesajın yok.<br>
+              <a href="index.html" style="color:var(--renk-birincil)">İlanlara göz at</a>
+            </div>`;
+          return;
+        }
+
+        konusmalar.forEach(k => {
+          const karsiTaraf = kullanici.id === k.ilan_sahibi_profil?.id
+            ? k.mesajci_profil
+            : k.ilan_sahibi_profil;
+
+          const item = document.createElement('div');
+          item.className = 'konusma-item';
+          item.dataset.id = k.id;
+
+          const basTutar = karsiTaraf?.ad_soyad?.charAt(0)?.toUpperCase() ?? '?';
+          const avatarHTML = karsiTaraf?.avatar_url
+            ? `<img src="${karsiTaraf.avatar_url}" alt="${karsiTaraf.ad_soyad}" />`
+            : basTutar;
+
+          item.innerHTML = `
+            <div class="konusma-avatar">${avatarHTML}</div>
+            <div class="konusma-bilgi">
+              <div class="konusma-ilan">${k.ilanlar?.kategoriler?.ikon ?? ''} ${k.ilanlar?.baslik ?? 'İlan'}</div>
+              <div class="konusma-ad">${karsiTaraf?.ad_soyad ?? 'Kullanıcı'}</div>
+              <div class="konusma-son-mesaj">${k.son_mesaj ?? 'Henüz mesaj yok'}</div>
+            </div>
+            <div class="konusma-meta">
+              <span class="konusma-tarih">${tarihFormatla(k.updated_at)}</span>
+              ${k.okunmadi > 0 ? `<span class="okunmamis-rozet">${k.okunmadi}</span>` : ''}
+            </div>
+          `;
+
+          item.addEventListener('click', () => konusmaAc(k.id, karsiTaraf, k.ilanlar));
+          liste.appendChild(item);
+        });
+
+        // URL'den gelen konuşmayı aç
+        if (hedefKonusma) {
+          const hedef = konusmalar.find(k => k.id === hedefKonusma);
+          if (hedef) {
+            const karsi = kullanici.id === hedef.ilan_sahibi_profil?.id
+              ? hedef.mesajci_profil : hedef.ilan_sahibi_profil;
+            konusmaAc(hedef.id, karsi, hedef.ilanlar);
+          }
+        }
+
+      } catch(e) {
+        liste.innerHTML = '<p style="padding:1.5rem;color:#ef4444;font-size:.875rem">Yüklenemedi.</p>';
+      }
+    }
+
+    // ── Konuşmayı aç ────────────────────────────────────────
+    async function konusmaAc(konusmaId, karsiTaraf, ilan) {
+      aktifKonusmaId = konusmaId;
+
+      // Listede aktif işaretle
+      document.querySelectorAll('.konusma-item').forEach(el => {
+        el.classList.toggle('aktif', el.dataset.id === konusmaId);
+      });
+
+      // Eski kanalı kapat
+      if (aktifKanal) { supabase.removeChannel(aktifKanal); aktifKanal = null; }
+
+      // Mesaj alanını kur
+      const alani = document.getElementById('mesaj-alani');
+      const basTutar = karsiTaraf?.ad_soyad?.charAt(0)?.toUpperCase() ?? '?';
+      const avatarHTML = karsiTaraf?.avatar_url
+        ? `<img src="${karsiTaraf.avatar_url}" alt="${karsiTaraf.ad_soyad}" />`
+        : basTutar;
+
+      alani.innerHTML = `
+        <div class="mesaj-baslik">
+          <div class="mesaj-baslik-avatar">${avatarHTML}</div>
+          <div class="mesaj-baslik-bilgi">
+            <div class="mesaj-baslik-ad">${karsiTaraf?.ad_soyad ?? 'Kullanıcı'}</div>
+            <div class="mesaj-baslik-ilan">
+              <a href="ilan-detay.html?id=${ilan?.id ?? ''}" style="color:#0ea5e9">
+                ${ilan?.kategoriler?.ikon ?? ''} ${ilan?.baslik ?? 'İlan'}
+              </a>
+            </div>
+          </div>
+        </div>
+        <div class="mesaj-listesi" id="mesaj-listesi">
+          <div class="yukleniyor-spinner"></div>
+        </div>
+        <div class="mesaj-gir-alani">
+          <textarea id="yeni-mesaj" rows="1" placeholder="Mesajını yaz..."></textarea>
+          <button class="mesaj-gonder-btn" id="mesaj-gonder-btn">➤</button>
+        </div>
+      `;
+
+      // Mesajları yükle
+      await mesajlariYukle(konusmaId);
+
+      // Okundu yap
+      await okunduYap(konusmaId, kullanici.id);
+      // Rozeti kaldır
+      const item = document.querySelector(`.konusma-item[data-id="${konusmaId}"]`);
+      item?.querySelector('.okunmamis-rozet')?.remove();
+
+      // Mesaj gönder
+      const textarea  = document.getElementById('yeni-mesaj');
+      const gonderBtn = document.getElementById('mesaj-gonder-btn');
+
+      async function gonder() {
+        const icerik = textarea.value.trim();
+        if (!icerik) return;
+        gonderBtn.disabled = true;
+        try {
+          await mesajGonder(konusmaId, kullanici.id, icerik);
+          textarea.value = '';
+          textarea.style.height = 'auto';
+        } catch(e) {
+          alert('Gönderilemedi: ' + e.message);
+        } finally {
+          gonderBtn.disabled = false;
+          textarea.focus();
+        }
+      }
+
+      gonderBtn.addEventListener('click', gonder);
+      textarea.addEventListener('keydown', e => {
+        if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); gonder(); }
+      });
+      textarea.addEventListener('input', () => {
+        textarea.style.height = 'auto';
+        textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+      });
+
+      // Realtime dinle
+      aktifKanal = mesajlariDinle(konusmaId, async (yeniMesaj) => {
+        // Kendi gönderdiğimizse zaten ekledik, atla
+        if (yeniMesaj.gonderen_id === kullanici.id) return;
+        // Karşı tarafın gönderdiğini ekle
+        const liste = document.getElementById('mesaj-listesi');
+        if (liste) {
+          ekleBalon(liste, {
+            ...yeniMesaj,
+            profiles: { ad_soyad: karsiTaraf?.ad_soyad }
+          }, kullanici.id);
+          liste.scrollTop = liste.scrollHeight;
+        }
+        await okunduYap(konusmaId, kullanici.id);
+      });
+    }
+
+    // ── Mesajları yükle ─────────────────────────────────────
+    async function mesajlariYukle(konusmaId) {
+      const liste = document.getElementById('mesaj-listesi');
+      if (!liste) return;
+      try {
+        const mesajlar = await mesajlariGetir(konusmaId);
+        liste.innerHTML = '';
+        if (mesajlar.length === 0) {
+          liste.innerHTML = `<p style="text-align:center;color:#9ca3af;font-size:.875rem;margin-top:2rem">Henüz mesaj yok. İlk mesajı sen gönder!</p>`;
+          return;
+        }
+        mesajlar.forEach(m => ekleBalon(liste, m, kullanici.id));
+        liste.scrollTop = liste.scrollHeight;
+      } catch(e) {
+        liste.innerHTML = '<p style="color:#ef4444;font-size:.875rem">Yüklenemedi.</p>';
+      }
+    }
+
+    // ── Balon ekle ──────────────────────────────────────────
+    function ekleBalon(liste, mesaj, benimId) {
+      const benim   = mesaj.gonderen_id === benimId;
+      const tarih   = new Date(mesaj.created_at).toLocaleTimeString('tr-TR', { hour:'2-digit', minute:'2-digit' });
+      const div     = document.createElement('div');
+      div.className = `mesaj-balonu ${benim ? 'benim' : 'karsi'}`;
+      div.innerHTML = `
+        <div class="balon-icerik">${escapeHTML(mesaj.icerik)}</div>
+        <span class="balon-tarih">${tarih}</span>
+      `;
+      liste.appendChild(div);
+    }
+
+    function escapeHTML(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+    }
+
+    // Başlat
+    konusmalariYukle();
+  </script>
+</body>
+</html>
