@@ -221,6 +221,40 @@
     }
     .satici-iletisim a:hover { background: #e0f2fe; }
 
+    /* Şikayet modalı */
+    .sikayet-modal-arkaplan {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.5); z-index: 500;
+      align-items: center; justify-content: center;
+    }
+    .sikayet-modal-arkaplan.aktif { display: flex; }
+    .sikayet-modal {
+      background: #fff; border-radius: 20px; padding: 2rem;
+      width: 100%; max-width: 420px; margin: 1rem;
+      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+    }
+    .sikayet-modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: #1f2937; }
+    .sikayet-secenekler { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1rem; }
+    .sikayet-secenek {
+      display: flex; align-items: center; gap: .75rem;
+      padding: .75rem 1rem; border: 1.5px solid #e5e7eb; border-radius: 10px;
+      cursor: pointer; transition: border-color .2s, background .2s;
+      font-size: .9rem; color: #374151; background: none; text-align: left;
+    }
+    .sikayet-secenek:hover { border-color: #0ea5e9; background: #f0f9ff; }
+    .sikayet-secenek.secili { border-color: #0ea5e9; background: #e0f2fe; color: #0284c7; font-weight: 600; }
+    .sikayet-aciklama {
+      width: 100%; padding: .65rem .875rem; border: 1.5px solid #e5e7eb;
+      border-radius: 10px; font-size: .875rem; font-family: inherit;
+      resize: none; outline: none; margin-bottom: 1rem; transition: border-color .2s;
+    }
+    .sikayet-aciklama:focus { border-color: #0ea5e9; }
+    .sikayet-modal-butonlar { display: flex; gap: .75rem; justify-content: flex-end; }
+    .sikayet-btn { padding: .5rem 1rem; border-radius: 8px; font-size: .875rem; font-weight: 600; cursor: pointer; border: none; }
+    .sikayet-iptal { background: #f3f4f6; color: #374151; }
+    .sikayet-gonder { background: #ef4444; color: #fff; }
+    .sikayet-gonder:disabled { opacity: .6; cursor: not-allowed; }
+
     /* Yükleniyor / hata */
     .yukleniyor-alani { padding: 4rem 0; }
 
@@ -323,6 +357,30 @@
         <div class="satici-iletisim" id="satici-iletisim"></div>
       </div>
 
+      <div id="sikayet-alan" style="display:none;text-align:center;margin-top:.75rem">
+        <button id="sikayet-btn" class="btn-link" style="color:#9ca3af;font-size:.8rem">
+          🚩 Bu ilanı şikayet et
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="sikayet-modal-arkaplan" id="sikayet-modal-arkaplan">
+    <div class="sikayet-modal">
+      <h3>🚩 Şikayet Sebebi</h3>
+      <div class="sikayet-secenekler">
+        <button class="sikayet-secenek" data-sebep="uygunsuz">🔞 Uygunsuz veya zararlı içerik</button>
+        <button class="sikayet-secenek" data-sebep="yaniltici">❌ Yanıltıcı veya sahte ilan</button>
+        <button class="sikayet-secenek" data-sebep="spam">📢 Spam veya reklam</button>
+        <button class="sikayet-secenek" data-sebep="diger">💬 Diğer</button>
+      </div>
+      <textarea class="sikayet-aciklama" id="sikayet-aciklama" rows="3"
+        placeholder="İsteğe bağlı: Daha fazla detay paylaşabilirsiniz..."></textarea>
+      <div class="sikayet-modal-butonlar">
+        <button class="sikayet-btn sikayet-iptal" id="sikayet-iptal">Vazgeç</button>
+        <button class="sikayet-btn sikayet-gonder" id="sikayet-gonder" disabled>Şikayet Gönder</button>
+      </div>
     </div>
   </div>
 
@@ -425,6 +483,11 @@
             </p>`;
         }
 
+        // Şikayet sistemini kur (kendi ilanı değilse)
+        if (kullanici && kullanici.id !== ilan.user_id) {
+          sikayetModalKur(kullanici, ilanId);
+        }
+
         // Kendi ilanı mı?
         if (kullanici && kullanici.id === ilan.user_id) {
           document.getElementById('kendi-ilan-alani').style.display = 'block';
@@ -470,6 +533,59 @@
         document.getElementById('ilan-yukleniyor').style.display = 'none';
         document.getElementById('ilan-hata').style.display = 'block';
       }
+    }
+
+    // ── Şikayet sistemi ─────────────────────────────────────
+    function sikayetModalKur(kullanici, ilanId) {
+      const alan = document.getElementById('sikayet-alan');
+      if (!kullanici) return;
+      alan.style.display = 'block';
+      let seciliSebep = null;
+      const modal     = document.getElementById('sikayet-modal-arkaplan');
+      const gonderBtn = document.getElementById('sikayet-gonder');
+
+      document.getElementById('sikayet-btn').addEventListener('click', () => {
+        modal.classList.add('aktif');
+      });
+      document.getElementById('sikayet-iptal').addEventListener('click', () => {
+        modal.classList.remove('aktif');
+      });
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) modal.classList.remove('aktif');
+      });
+      document.querySelectorAll('.sikayet-secenek').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.sikayet-secenek').forEach(b => b.classList.remove('secili'));
+          btn.classList.add('secili');
+          seciliSebep = btn.dataset.sebep;
+          gonderBtn.disabled = false;
+        });
+      });
+      gonderBtn.addEventListener('click', async () => {
+        if (!seciliSebep) return;
+        gonderBtn.disabled = true;
+        gonderBtn.textContent = 'Gönderiliyor...';
+        try {
+          const { error } = await supabase.from('sikayetler').insert({
+            ilan_id:  ilanId,
+            user_id:  kullanici.id,
+            sebep:    seciliSebep,
+            aciklama: document.getElementById('sikayet-aciklama').value.trim() || null
+          });
+          if (error && error.code === '23505') {
+            toastBilgi('Bu ilanı daha önce şikayet ettiniz.');
+          } else if (error) {
+            throw error;
+          } else {
+            toastBasari('Şikayetiniz alındı. Teşekkürler.');
+          }
+          modal.classList.remove('aktif');
+        } catch(e) {
+          toastHata('Şikayet gönderilemedi: ' + e.message);
+          gonderBtn.disabled = false;
+          gonderBtn.textContent = 'Şikayet Gönder';
+        }
+      });
     }
 
     // ── Mesaj gönderme (konuşma yoksa oluştur) ──────────────
