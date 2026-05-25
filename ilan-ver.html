@@ -271,11 +271,14 @@
     import { toastBasari, toastHata, btnYukleniyor } from './js/ui.js';
     import { supabase }                       from './js/config.js';
 
-    // Giriş kontrolü
+    // Giriş kontrolü — sayfa içeriğini gizle, oturum yoksa yönlendir
+    document.body.style.visibility = 'hidden';
     const kullanici = await mevcutKullanici();
     if (!kullanici) {
-      window.location.href = 'giris.html?sonra=ilan-ver.html';
+      window.location.replace('giris.html?sonra=ilan-ver.html');
+      throw new Error('Giriş gerekli');
     }
+    document.body.style.visibility = 'visible';
 
     // Seçili fotoğraflar
     let fotograflar = [];
