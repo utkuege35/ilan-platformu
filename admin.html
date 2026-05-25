@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <base href="/ilan-platformu/" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src *.supabase.co; img-src 'self' data: blob: *.supabase.co; style-src 'self' 'unsafe-inline';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Paneli — İlan Platformu</title>
+  <link rel="stylesheet" href="css/main.css" />
+  <style>
+    .admin-layout {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: calc(100vh - 64px);
+    }
+
+    /* ── Sidebar ──────────────────────────────────────────── */
+    .admin-sidebar {
+      background: #1e293b;
+      padding: 1.5rem 0;
+      position: sticky;
+      top: 64px;
+      height: calc(100vh - 64px);
+      overflow-y: auto;
+    }
+    .sidebar-baslik {
+      padding: .5rem 1.25rem 1.25rem;
+      color: #94a3b8;
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+    .sidebar-menu-item {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .75rem 1.25rem;
+      color: #cbd5e1;
+      font-size: .9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background .15s, color .15s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    .sidebar-menu-item:hover { background: #334155; color: #fff; }
+    .sidebar-menu-item.aktif { background: #0ea5e9; color: #fff; }
+    .sidebar-menu-item .rozet {
+      margin-left: auto;
+      background: #ef4444;
+      color: #fff;
+      border-radius: 99px;
+      padding: .1rem .5rem;
+      font-size: .7rem;
+      font-weight: 700;
+    }
+
+    /* ── Ana içerik ───────────────────────────────────────── */
+    .admin-icerik {
+      background: #f8fafc;
+      padding: 2rem;
+      overflow-y: auto;
+    }
+    .admin-sayfa { display: none; }
+    .admin-sayfa.aktif { display: block; }
+
+    .admin-baslik {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: #1e293b;
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── İstatistik kartları ──────────────────────────────── */
+    .istat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .istat-kart {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 1.25rem;
+    }
+    .istat-sayi {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #0ea5e9;
+      line-height: 1;
+      margin-bottom: .35rem;
+    }
+    .istat-etiket { font-size: .875rem; color: #64748b; }
+
+    /* ── Tablo ────────────────────────────────────────────── */
+    .admin-tablo-kap {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .admin-tablo-baslik {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid #f1f5f9;
+      font-size: .95rem;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .875rem;
+    }
+    thead th {
+      background: #f8fafc;
+      padding: .75rem 1rem;
+      text-align: left;
+      font-size: .75rem;
+      font-weight: 700;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    tbody tr { border-bottom: 1px solid #f1f5f9; transition: background .1s; }
+    tbody tr:hover { background: #f8fafc; }
+    tbody tr:last-child { border-bottom: none; }
+    td { padding: .875rem 1rem; color: #374151; vertical-align: middle; }
+    .td-baslik { font-weight: 600; color: #1e293b; max-width: 240px; }
+    .td-baslik a { color: #0ea5e9; text-decoration: none; }
+    .td-baslik a:hover { text-decoration: underline; }
+
+    /* Durum etiketleri */
+    .etiket {
+      display: inline-block;
+      padding: .2rem .65rem;
+      border-radius: 99px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+    .etiket-aktif   { background: #dcfce7; color: #16a34a; }
+    .etiket-pasif   { background: #f1f5f9; color: #64748b; }
+    .etiket-sikayet { background: #fef2f2; color: #dc2626; }
+    .etiket-spam    { background: #fff7ed; color: #ea580c; }
+    .etiket-yaniltici { background: #fefce8; color: #ca8a04; }
+    .etiket-uygunsuz  { background: #fdf2f8; color: #9d174d; }
+    .etiket-diger     { background: #f1f5f9; color: #475569; }
+
+    /* Aksiyon butonları */
+    .aksiyon-grup { display: flex; gap: .4rem; flex-wrap: wrap; }
+    .admin-btn {
+      padding: .3rem .7rem;
+      border-radius: 6px;
+      font-size: .775rem;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .admin-btn:hover { opacity: .85; }
+    .admin-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .btn-gizle    { background: #fef2f2; color: #dc2626; }
+    .btn-aktif-et { background: #dcfce7; color: #16a34a; }
+    .btn-temizle  { background: #f1f5f9; color: #475569; }
+    .btn-goruntule { background: #e0f2fe; color: #0284c7; }
+
+    /* Filtre çubuğu */
+    .filtre-bar {
+      display: flex;
+      gap: .75rem;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filtre-bar select, .filtre-bar input {
+      padding: .5rem .875rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: .875rem;
+      background: #fff;
+      color: #374151;
+      outline: none;
+    }
+    .filtre-bar select:focus, .filtre-bar input:focus {
+      border-color: #0ea5e9;
+    }
+
+    /* Boş durum */
+    .admin-bos {
+      text-align: center;
+      padding: 3rem;
+      color: #94a3b8;
+    }
+    .admin-bos-ikon { font-size: 2.5rem; margin-bottom: .75rem; }
+
+    @media (max-width: 768px) {
+      .admin-layout { grid-template-columns: 1fr; }
+      .admin-sidebar { position: static; height: auto; }
+      .admin-icerik { padding: 1rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav class="navbar">
+    <div class="navbar-ic">
+      <a href="index.html" class="navbar-logo">🏠 İlan Platformu</a>
+      <div class="navbar-saglar">
+        <span style="font-size:.8rem;color:#6b7280;font-weight:600">🔐 Admin Paneli</span>
+        <a href="index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">Siteye Dön</a>
+        <button id="cikis-btn" class="btn-link" style="color:#ef4444">Çıkış</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-baslik">Yönetim</div>
+      <button class="sidebar-menu-item aktif" data-sayfa="ozet">
+        📊 Genel Bakış
+      </button>
+      <button class="sidebar-menu-item" data-sayfa="sikayetler">
+        🚩 Şikayetler
+        <span class="rozet" id="sikayet-rozet" style="display:none">0</span>
+      </button>
+      <button class="sidebar-menu-item" data-sayfa="ilanlar">
+        📋 Tüm İlanlar
+      </button>
+      <button class="sidebar-menu-item" data-sayfa="kullanicilar">
+        👥 Kullanıcılar
+      </button>
+    </aside>
+
+    <!-- Ana içerik -->
+    <main class="admin-icerik">
+
+      <!-- GENEL BAKIŞ -->
+      <div class="admin-sayfa aktif" id="sayfa-ozet">
+        <div class="admin-baslik">📊 Genel Bakış</div>
+        <div class="istat-grid" id="istat-grid">
+          <div class="yukleniyor-spinner"></div>
+        </div>
+        <div class="admin-tablo-kap">
+          <div class="admin-tablo-baslik">🚩 Son Şikayetler</div>
+          <div id="son-sikayetler-tablo"></div>
+        </div>
+      </div>
+
+      <!-- ŞİKAYETLER -->
+      <div class="admin-sayfa" id="sayfa-sikayetler">
+        <div class="admin-baslik">🚩 Şikayetler</div>
+        <div class="filtre-bar">
+          <select id="sikayet-filtre-sebep">
+            <option value="">Tüm Sebepler</option>
+            <option value="uygunsuz">Uygunsuz</option>
+            <option value="yaniltici">Yanıltıcı</option>
+            <option value="spam">Spam</option>
+            <option value="diger">Diğer</option>
+          </select>
+        </div>
+        <div class="admin-tablo-kap">
+          <div id="sikayetler-tablo"></div>
+        </div>
+      </div>
+
+      <!-- TÜM İLANLAR -->
+      <div class="admin-sayfa" id="sayfa-ilanlar">
+        <div class="admin-baslik">📋 Tüm İlanlar</div>
+        <div class="filtre-bar">
+          <select id="ilan-filtre-durum">
+            <option value="">Tüm Durumlar</option>
+            <option value="aktif">Aktif</option>
+            <option value="pasif">Pasif</option>
+          </select>
+          <input type="text" id="ilan-ara" placeholder="İlan ara..." style="min-width:200px" />
+        </div>
+        <div class="admin-tablo-kap">
+          <div id="ilanlar-tablo"></div>
+        </div>
+      </div>
+
+      <!-- KULLANICILAR -->
+      <div class="admin-sayfa" id="sayfa-kullanicilar">
+        <div class="admin-baslik">👥 Kullanıcılar</div>
+        <div class="filtre-bar">
+          <input type="text" id="kullanici-ara" placeholder="İsim veya şehir ara..." style="min-width:200px" />
+        </div>
+        <div class="admin-tablo-kap">
+          <div id="kullanicilar-tablo"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script type="module">
+    import { mevcutKullanici, cikisYap } from './js/auth.js';
+    import { supabase }                  from './js/config.js';
+    import { tarihFormatla }             from './js/ui.js';
+
+    // ── Admin kontrolü ───────────────────────────────────────
+    document.body.style.visibility = 'hidden';
+    const kullanici = await mevcutKullanici();
+    if (!kullanici) {
+      window.location.replace('giris.html');
+      throw new Error('Giriş gerekli');
+    }
+    const { data: profil } = await supabase
+      .from('profiles').select('rol').eq('id', kullanici.id).single();
+    if (!profil || profil.rol !== 'admin') {
+      window.location.replace('index.html');
+      throw new Error('Admin yetkisi gerekli');
+    }
+    document.body.style.visibility = 'visible';
+
+    document.getElementById('cikis-btn').addEventListener('click', cikisYap);
+
+    // ── Sekme geçişi ─────────────────────────────────────────
+    document.querySelectorAll('.sidebar-menu-item').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sidebar-menu-item').forEach(b => b.classList.remove('aktif'));
+        document.querySelectorAll('.admin-sayfa').forEach(s => s.classList.remove('aktif'));
+        btn.classList.add('aktif');
+        document.getElementById(`sayfa-${btn.dataset.sayfa}`).classList.add('aktif');
+        sayfaYukle(btn.dataset.sayfa);
+      });
+    });
+
+    // ── Sayfa yükleyici ──────────────────────────────────────
+    const yuklenmis = new Set();
+    async function sayfaYukle(sayfa) {
+      if (yuklenmis.has(sayfa)) return;
+      yuklenmis.add(sayfa);
+      if (sayfa === 'ozet')         await ozetYukle();
+      if (sayfa === 'sikayetler')   await sikayetlerYukle();
+      if (sayfa === 'ilanlar')      await ilanlarYukle();
+      if (sayfa === 'kullanicilar') await kullanicilariYukle();
+    }
+    sayfaYukle('ozet');
+
+    // ── GENEL BAKIŞ ─────────────────────────────────────────
+    async function ozetYukle() {
+      const [
+        { count: toplamIlan },
+        { count: aktifIlan },
+        { count: toplamKullanici },
+        { count: bekleyenSikayet },
+      ] = await Promise.all([
+        supabase.from('ilanlar').select('*', { count: 'exact', head: true }),
+        supabase.from('ilanlar').select('*', { count: 'exact', head: true }).eq('durum', 'aktif'),
+        supabase.from('profiles').select('*', { count: 'exact', head: true }),
+        supabase.from('sikayetler').select('*', { count: 'exact', head: true }),
+      ]);
+
+      document.getElementById('istat-grid').innerHTML = `
+        <div class="istat-kart">
+          <div class="istat-sayi">${toplamIlan ?? 0}</div>
+          <div class="istat-etiket">Toplam İlan</div>
+        </div>
+        <div class="istat-kart">
+          <div class="istat-sayi">${aktifIlan ?? 0}</div>
+          <div class="istat-etiket">Aktif İlan</div>
+        </div>
+        <div class="istat-kart">
+          <div class="istat-sayi">${toplamKullanici ?? 0}</div>
+          <div class="istat-etiket">Kullanıcı</div>
+        </div>
+        <div class="istat-kart">
+          <div class="istat-sayi" style="color:#ef4444">${bekleyenSikayet ?? 0}</div>
+          <div class="istat-etiket">Şikayet</div>
+        </div>
+      `;
+
+      // Rozeti güncelle
+      if (bekleyenSikayet > 0) {
+        const rozet = document.getElementById('sikayet-rozet');
+        rozet.textContent = bekleyenSikayet;
+        rozet.style.display = 'inline';
+      }
+
+      // Son şikayetler
+      const { data: sonSikayetler } = await supabase
+        .from('sikayetler')
+        .select(`id, sebep, created_at, ilanlar(id, baslik, durum), profiles(ad_soyad)`)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      document.getElementById('son-sikayetler-tablo').innerHTML =
+        sikayetTabloHTML(sonSikayetler ?? [], true);
+    }
+
+    // ── ŞİKAYETLER ──────────────────────────────────────────
+    async function sikayetlerYukle() {
+      const { data } = await supabase
+        .from('sikayetler')
+        .select(`id, sebep, aciklama, created_at,
+          ilanlar(id, baslik, durum, sikayet_sayisi),
+          profiles(ad_soyad)`)
+        .order('created_at', { ascending: false });
+
+      document.getElementById('sikayetler-tablo').innerHTML =
+        sikayetTabloHTML(data ?? [], false);
+
+      // Filtre
+      document.getElementById('sikayet-filtre-sebep').addEventListener('change', async (e) => {
+        yuklenmis.delete('sikayetler');
+        const sebep = e.target.value;
+        let sorgu = supabase.from('sikayetler')
+          .select(`id, sebep, aciklama, created_at, ilanlar(id, baslik, durum, sikayet_sayisi), profiles(ad_soyad)`)
+          .order('created_at', { ascending: false });
+        if (sebep) sorgu = sorgu.eq('sebep', sebep);
+        const { data } = await sorgu;
+        document.getElementById('sikayetler-tablo').innerHTML = sikayetTabloHTML(data ?? [], false);
+        baglantilarKur();
+      });
+
+      baglantilarKur();
+    }
+
+    function sikayetTabloHTML(rows, kisa) {
+      if (rows.length === 0) return `<div class="admin-bos"><div class="admin-bos-ikon">✅</div><p>Şikayet yok</p></div>`;
+      return `<table>
+        <thead><tr>
+          <th>İlan</th>
+          <th>Şikayet Eden</th>
+          <th>Sebep</th>
+          ${!kisa ? '<th>Açıklama</th>' : ''}
+          <th>Tarih</th>
+          <th>İşlem</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map(s => `<tr data-sikayet-id="${s.id}" data-ilan-id="${s.ilanlar?.id}">
+            <td class="td-baslik">
+              <a href="ilan-detay.html?id=${s.ilanlar?.id}" target="_blank">${s.ilanlar?.baslik ?? '—'}</a>
+              <br><span class="etiket etiket-${s.ilanlar?.durum ?? 'pasif'}">${s.ilanlar?.durum ?? '—'}</span>
+              ${s.ilanlar?.sikayet_sayisi > 1 ? `<span class="etiket etiket-sikayet">${s.ilanlar.sikayet_sayisi} şikayet</span>` : ''}
+            </td>
+            <td>${s.profiles?.ad_soyad ?? '—'}</td>
+            <td><span class="etiket etiket-${s.sebep}">${sebepMetni(s.sebep)}</span></td>
+            ${!kisa ? `<td style="max-width:180px;color:#6b7280">${s.aciklama ?? '—'}</td>` : ''}
+            <td style="white-space:nowrap">${tarihFormatla(s.created_at)}</td>
+            <td>
+              <div class="aksiyon-grup">
+                <button class="admin-btn btn-gizle" data-aksiyon="ilan-pasif" data-ilan-id="${s.ilanlar?.id}">İlanı Gizle</button>
+                <button class="admin-btn btn-temizle" data-aksiyon="sikayet-sil" data-sikayet-id="${s.id}">Şikayeti Sil</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+    }
+
+    function sebepMetni(sebep) {
+      return { uygunsuz: '🔞 Uygunsuz', yaniltici: '❌ Yanıltıcı', spam: '📢 Spam', diger: '💬 Diğer' }[sebep] ?? sebep;
+    }
+
+    // ── TÜM İLANLAR ─────────────────────────────────────────
+    async function ilanlarYukle() {
+      const { data } = await supabase
+        .from('ilanlar')
+        .select(`id, baslik, durum, sikayet_sayisi, created_at, goruntuleme,
+          kategoriler(ad, ikon), profiles(ad_soyad)`)
+        .order('created_at', { ascending: false });
+
+      ilanTabloGoster(data ?? []);
+
+      let tumIlanlar = data ?? [];
+
+      function filtrele() {
+        const durum = document.getElementById('ilan-filtre-durum').value;
+        const ara   = document.getElementById('ilan-ara').value.toLowerCase();
+        let liste   = tumIlanlar;
+        if (durum) liste = liste.filter(i => i.durum === durum);
+        if (ara)   liste = liste.filter(i => i.baslik.toLowerCase().includes(ara));
+        ilanTabloGoster(liste);
+        baglantilarKur();
+      }
+
+      document.getElementById('ilan-filtre-durum').addEventListener('change', filtrele);
+      document.getElementById('ilan-ara').addEventListener('input', filtrele);
+      baglantilarKur();
+    }
+
+    function ilanTabloGoster(ilanlar) {
+      const el = document.getElementById('ilanlar-tablo');
+      if (ilanlar.length === 0) {
+        el.innerHTML = `<div class="admin-bos"><div class="admin-bos-ikon">📋</div><p>İlan yok</p></div>`;
+        return;
+      }
+      el.innerHTML = `<table>
+        <thead><tr>
+          <th>İlan</th><th>Kategori</th><th>Kullanıcı</th>
+          <th>Görüntülenme</th><th>Şikayet</th><th>Tarih</th><th>İşlem</th>
+        </tr></thead>
+        <tbody>
+          ${ilanlar.map(i => `<tr>
+            <td class="td-baslik">
+              <a href="ilan-detay.html?id=${i.id}" target="_blank">${i.baslik}</a>
+            </td>
+            <td>${i.kategoriler?.ikon ?? ''} ${i.kategoriler?.ad ?? '—'}</td>
+            <td>${i.profiles?.ad_soyad ?? '—'}</td>
+            <td>👁 ${i.goruntuleme}</td>
+            <td>${i.sikayet_sayisi > 0 ? `<span class="etiket etiket-sikayet">🚩 ${i.sikayet_sayisi}</span>` : '—'}</td>
+            <td style="white-space:nowrap">${tarihFormatla(i.created_at)}</td>
+            <td>
+              <div class="aksiyon-grup">
+                ${i.durum === 'aktif'
+                  ? `<button class="admin-btn btn-gizle" data-aksiyon="ilan-pasif" data-ilan-id="${i.id}">Gizle</button>`
+                  : `<button class="admin-btn btn-aktif-et" data-aksiyon="ilan-aktif" data-ilan-id="${i.id}">Aktif Et</button>`
+                }
+                <button class="admin-btn btn-goruntule" data-aksiyon="ilan-goruntule" data-ilan-id="${i.id}">Görüntüle</button>
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+    }
+
+    // ── KULLANICILAR ─────────────────────────────────────────
+    async function kullanicilariYukle() {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, ad_soyad, sehir, telefon, rol, created_at')
+        .order('created_at', { ascending: false });
+
+      let tumKullanicilar = data ?? [];
+      kullaniciTabloGoster(tumKullanicilar);
+
+      document.getElementById('kullanici-ara').addEventListener('input', (e) => {
+        const ara = e.target.value.toLowerCase();
+        kullaniciTabloGoster(
+          tumKullanicilar.filter(k =>
+            k.ad_soyad?.toLowerCase().includes(ara) ||
+            k.sehir?.toLowerCase().includes(ara)
+          )
+        );
+        baglantilarKur();
+      });
+      baglantilarKur();
+    }
+
+    function kullaniciTabloGoster(kullanicilar) {
+      const el = document.getElementById('kullanicilar-tablo');
+      if (kullanicilar.length === 0) {
+        el.innerHTML = `<div class="admin-bos"><div class="admin-bos-ikon">👥</div><p>Kullanıcı yok</p></div>`;
+        return;
+      }
+      el.innerHTML = `<table>
+        <thead><tr>
+          <th>Ad Soyad</th><th>Şehir</th><th>Telefon</th><th>Rol</th><th>Kayıt</th><th>İşlem</th>
+        </tr></thead>
+        <tbody>
+          ${kullanicilar.map(k => `<tr>
+            <td class="td-baslik">${k.ad_soyad ?? '—'}</td>
+            <td>${k.sehir ?? '—'}</td>
+            <td>${k.telefon ?? '—'}</td>
+            <td>
+              <span class="etiket ${k.rol === 'admin' ? 'etiket-aktif' : 'etiket-pasif'}">
+                ${k.rol === 'admin' ? '👑 Admin' : '👤 Üye'}
+              </span>
+            </td>
+            <td style="white-space:nowrap">${tarihFormatla(k.created_at)}</td>
+            <td>
+              <div class="aksiyon-grup">
+                ${k.rol !== 'admin' && k.id !== kullanici.id
+                  ? `<button class="admin-btn btn-gizle" data-aksiyon="kullanici-banlista" data-kullanici-id="${k.id}" title="Kullanıcının ilanlarını gizle">İlanları Gizle</button>`
+                  : ''}
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>`;
+    }
+
+    // ── Buton bağlantıları ───────────────────────────────────
+    function baglantilarKur() {
+      document.querySelectorAll('[data-aksiyon]').forEach(btn => {
+        if (btn.dataset.baglandi) return;
+        btn.dataset.baglandi = '1';
+        btn.addEventListener('click', () aksiyonIsle(btn));
+      });
+    }
+
+    async function aksiyonIsle(btn) {
+      const aksiyon = btn.dataset.aksiyon;
+      btn.disabled = true;
+
+      try {
+        if (aksiyon === 'ilan-pasif') {
+          if (!confirm('Bu ilanı gizlemek istediğine emin misin?')) { btn.disabled = false; return; }
+          await supabase.from('ilanlar').update({ durum: 'pasif' }).eq('id', btn.dataset.ilanId);
+          btn.textContent = '✅ Gizlendi';
+          btn.className = 'admin-btn btn-temizle';
+          yuklenmis.delete('ozet'); yuklenmis.delete('ilanlar'); yuklenmis.delete('sikayetler');
+
+        } else if (aksiyon === 'ilan-aktif') {
+          await supabase.from('ilanlar').update({ durum: 'aktif' }).eq('id', btn.dataset.ilanId);
+          btn.textContent = '✅ Aktif';
+          yuklenmis.delete('ilanlar');
+
+        } else if (aksiyon === 'sikayet-sil') {
+          if (!confirm('Bu şikayeti silmek istediğine emin misin?')) { btn.disabled = false; return; }
+          await supabase.from('sikayetler').delete().eq('id', btn.dataset.sikayetId);
+          btn.closest('tr')?.remove();
+          yuklenmis.delete('ozet');
+
+        } else if (aksiyon === 'ilan-goruntule') {
+          window.open(`ilan-detay.html?id=${btn.dataset.ilanId}`, '_blank');
+          btn.disabled = false; return;
+
+        } else if (aksiyon === 'kullanici-banlista') {
+          if (!confirm('Bu kullanıcının tüm ilanları gizlenecek. Devam?')) { btn.disabled = false; return; }
+          await supabase.from('ilanlar')
+            .update({ durum: 'pasif' })
+            .eq('user_id', btn.dataset.kullaniciId);
+          btn.textContent = '✅ Gizlendi';
+          yuklenmis.delete('ilanlar');
+        }
+      } catch(e) {
+        alert('Hata: ' + e.message);
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
