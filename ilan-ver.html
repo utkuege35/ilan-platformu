@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <base href="/ilan-platformu/" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src *.supabase.co; img-src 'self' data: blob: *.supabase.co; style-src 'self' 'unsafe-inline';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>İlan Ver — İlan Platformu</title>
   <link rel="stylesheet" href="css/main.css" />
@@ -267,6 +271,7 @@
 
   <script type="module">
     import { kategorileriGetir, ilanOlustur } from './js/ilanlar.js';
+    import { ilanDogrula, istemciRateLimit } from './js/validation.js';
     import { mevcutKullanici }                from './js/auth.js';
     import { toastBasari, toastHata, btnYukleniyor } from './js/ui.js';
     import { supabase }                       from './js/config.js';
@@ -382,15 +387,17 @@
       const sehir       = document.getElementById('sehir').value.trim();
       const ilce        = document.getElementById('ilce').value.trim();
 
+      // Rate limit kontrolü
+      const limit = istemciRateLimit('ilan-olustur', 30);
+      if (!limit.izinli) return toastHata(`Lütfen ${limit.kalanSaniye} saniye bekleyin.`);
+
       // Doğrulama
-      if (!kategoriId) return toastHata('Lütfen bir kategori seçin.');
-      if (!baslik)     return toastHata('Başlık zorunludur.');
-      if (!aciklama)   return toastHata('Açıklama zorunludur.');
-      if (!sehir)      return toastHata('Şehir zorunludur.');
+      const { gecerli, hatalar, temizVeri } = ilanDogrula({ kategoriId, baslik, aciklama, fiyat, sehir, ilce });
+      if (!gecerli) return toastHata(hatalar[0]);
 
       try {
         btnYukleniyor(gonderBtn, true, 'İlanı Yayınla');
-        const ilan = await ilanOlustur({ kategoriId, baslik, aciklama, fiyat, fiyatBirimi, sehir, ilce });
+        const ilan = await ilanOlustur({ ...temizVeri, fiyatBirimi });
         if (fotograflar.length > 0) await fotograflariYukle(ilan.id);
         toastBasari('İlanın yayınlandı! 🎉');
         setTimeout(() => { window.location.href = `ilan-detay.html?id=${ilan.id}`; }, 1200);
