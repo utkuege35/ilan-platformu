@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <base href="/ilan-platformu/" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src *.supabase.co; img-src 'self' data: blob: *.supabase.co; style-src 'self' 'unsafe-inline';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profilim — İlan Platformu</title>
   <link rel="stylesheet" href="css/main.css" />
@@ -289,6 +293,7 @@
 
   <script type="module">
     import { profilGetir, profilGuncelle, avatarYukle } from './js/profil.js';
+    import { metinTemizle, telefonTemizle, telefonGecerliMi } from './js/validation.js';
     import { benimIlanlarim, ilanGuncelle, ilanSil }    from './js/ilanlar.js';
     import { mevcutKullanici, cikisYap }                from './js/auth.js';
     import { toastBasari, toastHata, fiyatFormatla, tarihFormatla } from './js/ui.js';
@@ -441,11 +446,13 @@
       const btn = document.getElementById('profil-kaydet-btn');
       btn.disabled = true; btn.textContent = 'Kaydediliyor...';
       try {
+        const telefon = telefonTemizle(document.getElementById('duz-telefon').value);
+        if (telefon && !telefonGecerliMi(telefon)) throw new Error('Geçersiz telefon numarası.');
         profil = await profilGuncelle(kullanici.id, {
-          ad_soyad: document.getElementById('duz-ad').value.trim(),
-          telefon:  document.getElementById('duz-telefon').value.trim(),
-          sehir:    document.getElementById('duz-sehir').value.trim(),
-          bio:      document.getElementById('duz-bio').value.trim(),
+          ad_soyad: metinTemizle(document.getElementById('duz-ad').value, 100),
+          telefon:  telefon,
+          sehir:    metinTemizle(document.getElementById('duz-sehir').value, 50),
+          bio:      metinTemizle(document.getElementById('duz-bio').value, 500),
         });
         profilGoster(profil);
         const mesajEl = document.getElementById('profil-mesaj');
