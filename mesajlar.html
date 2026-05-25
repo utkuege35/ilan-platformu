@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <base href="/ilan-platformu/" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src *.supabase.co; img-src 'self' data: blob: *.supabase.co; style-src 'self' 'unsafe-inline';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mesajlar — İlan Platformu</title>
   <link rel="stylesheet" href="css/main.css" />
@@ -287,6 +291,7 @@
 
   <script type="module">
     import { konusmalariGetir, mesajlariGetir, mesajGonder, okunduYap, mesajlariDinle } from './js/mesajlar.js';
+    import { mesajDogrula, istemciRateLimit } from './js/validation.js';
     import { mevcutKullanici }    from './js/auth.js';
     import { tarihFormatla }      from './js/ui.js';
     import { supabase }           from './js/config.js';
@@ -421,11 +426,13 @@
       const gonderBtn = document.getElementById('mesaj-gonder-btn');
 
       async function gonder() {
-        const icerik = textarea.value.trim();
-        if (!icerik) return;
+        const { gecerli, hata, temiz } = mesajDogrula(textarea.value);
+        if (!gecerli) return;
+        const limit = istemciRateLimit('mesaj-gonder', 3);
+        if (!limit.izinli) return;
         gonderBtn.disabled = true;
         try {
-          await mesajGonder(konusmaId, kullanici.id, icerik);
+          await mesajGonder(konusmaId, kullanici.id, temiz);
           textarea.value = '';
           textarea.style.height = 'auto';
         } catch(e) {
