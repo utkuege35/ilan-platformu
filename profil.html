@@ -295,8 +295,13 @@
     import { supabase }                                 from './js/config.js';
 
     // Giriş kontrolü
+    document.body.style.visibility = 'hidden';
     const kullanici = await mevcutKullanici();
-    if (!kullanici) window.location.href = 'giris.html?sonra=profil.html';
+    if (!kullanici) {
+      window.location.replace('giris.html?sonra=profil.html');
+      throw new Error('Giriş gerekli');
+    }
+    document.body.style.visibility = 'visible';
 
     document.getElementById('cikis-btn').addEventListener('click', cikisYap);
 
