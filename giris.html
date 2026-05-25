@@ -61,11 +61,62 @@
     </div>
 
     <div id="auth-mesaj" class="auth-mesaj gizli"></div>
+
+    <!-- Şifre sıfırlama formu (reset linkten gelince gösterilir) -->
+    <div id="sifre-guncelle-formu" class="auth-form gizli">
+      <div style="text-align:center;margin-bottom:1.25rem">
+        <div style="font-size:2rem;margin-bottom:.5rem">🔒</div>
+        <h2 style="font-size:1.1rem;font-weight:700;color:#1f2937">Yeni Şifre Belirle</h2>
+        <p style="font-size:.875rem;color:#6b7280;margin-top:.25rem">Lütfen yeni şifrenizi girin.</p>
+      </div>
+      <div class="form-grup">
+        <label for="yeni-sifre">Yeni Şifre</label>
+        <input type="password" id="yeni-sifre" placeholder="En az 6 karakter" />
+      </div>
+      <div class="form-grup">
+        <label for="yeni-sifre-tekrar">Şifre Tekrar</label>
+        <input type="password" id="yeni-sifre-tekrar" placeholder="Aynı şifreyi tekrar girin" />
+      </div>
+      <button id="sifre-guncelle-btn" class="btn-birincil tam">Şifremi Güncelle</button>
+    </div>
   </div>
 
   <script type="module">
-    import { girisYap, kayitOl, sifreSifirla, mevcutKullanici } from './js/auth.js';
+    import { girisYap, kayitOl, sifreSifirla, sifreGuncelle, mevcutKullanici } from './js/auth.js';
+    import { supabase } from './js/config.js';
     import { kayitDogrula, epostaGecerliMi, istemciRateLimit } from './js/validation.js';
+
+    // ── Şifre sıfırlama modu kontrolü ──────────────────────
+    // Supabase reset linkinden gelince URL'de token olur
+    // onAuthStateChange ile PASSWORD_RECOVERY event'i yakalarız
+    supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        // Sekmeleri gizle, reset formunu göster
+        document.querySelector('.auth-sekmeler').style.display = 'none';
+        document.getElementById('giris-formu').classList.add('gizli');
+        document.getElementById('kayit-formu').classList.add('gizli');
+        document.getElementById('sifre-guncelle-formu').classList.remove('gizli');
+      }
+    });
+
+    // Şifre güncelle butonu
+    document.getElementById('sifre-guncelle-btn').addEventListener('click', async () => {
+      const yeniSifre      = document.getElementById('yeni-sifre').value;
+      const yeniSifreTekrar = document.getElementById('yeni-sifre-tekrar').value;
+      if (yeniSifre.length < 6) return mesajGoster('Şifre en az 6 karakter olmalı.', 'hata');
+      if (yeniSifre !== yeniSifreTekrar) return mesajGoster('Şifreler eşleşmiyor.', 'hata');
+      try {
+        const btn = document.getElementById('sifre-guncelle-btn');
+        btn.disabled = true; btn.textContent = 'Güncelleniyor...';
+        await sifreGuncelle(yeniSifre);
+        mesajGoster('Şifreniz güncellendi! Yönlendiriliyorsunuz...', 'basari');
+        setTimeout(() => window.location.href = 'index.html', 2000);
+      } catch(e) {
+        mesajGoster(e.message, 'hata');
+        document.getElementById('sifre-guncelle-btn').disabled = false;
+        document.getElementById('sifre-guncelle-btn').textContent = 'Şifremi Güncelle';
+      }
+    });
 
     // Zaten giriş yapmışsa ana sayfaya yönlendir
     mevcutKullanici().then(k => {
