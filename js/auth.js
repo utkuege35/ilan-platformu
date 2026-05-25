@@ -44,7 +44,7 @@ export async function girisYap({ email, sifre }) {
 export async function cikisYap() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
-  window.location.href = '/index.html';
+  window.location.href = 'index.html';
 }
 
 // ── Mevcut kullanıcıyı al ────────────────────────────────
@@ -89,6 +89,12 @@ export async function sifreSifirla(email) {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${window.location.origin}/ilan-platformu/giris.html?mod=sifre-guncelle`
   });
+  if (error) throw error;
+}
+
+// ── Yeni şifre belirle (reset linkten sonra) ────────────
+export async function sifreGuncelle(yeniSifre) {
+  const { error } = await supabase.auth.updateUser({ password: yeniSifre });
   if (error) throw error;
 }
 
