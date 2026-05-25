@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <base href="/ilan-platformu/" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src *.supabase.co; img-src 'self' data: blob: *.supabase.co; style-src 'self' 'unsafe-inline';">
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Giriş Yap — İlan Platformu</title>
   <link rel="stylesheet" href="css/main.css" />
@@ -62,6 +66,7 @@
 
   <script type="module">
     import { girisYap, kayitOl, sifreSifirla, mevcutKullanici } from './js/auth.js';
+    import { kayitDogrula, epostaGecerliMi, istemciRateLimit } from './js/validation.js';
 
     // Zaten giriş yapmışsa ana sayfaya yönlendir
     mevcutKullanici().then(k => {
@@ -85,6 +90,9 @@
       const email = document.getElementById('giris-email').value.trim();
       const sifre = document.getElementById('giris-sifre').value;
       if (!email || !sifre) return mesajGoster('E-posta ve şifre gerekli.', 'hata');
+      if (!epostaGecerliMi(email)) return mesajGoster('Geçerli bir e-posta adresi girin.', 'hata');
+      const girisLimit = istemciRateLimit('giris', 10);
+      if (!girisLimit.izinli) return mesajGoster(`Lütfen ${girisLimit.kalanSaniye} saniye bekleyin.`, 'hata');
       try {
         yukleniyorAyarla('giris-btn', true);
         await girisYap({ email, sifre });
@@ -103,8 +111,10 @@
       const telefon  = document.getElementById('kayit-telefon').value.trim();
       const sehir    = document.getElementById('kayit-sehir').value.trim();
       const sifre    = document.getElementById('kayit-sifre').value;
-      if (!adSoyad || !email || !sifre) return mesajGoster('Ad, e-posta ve şifre zorunlu.', 'hata');
-      if (sifre.length < 6) return mesajGoster('Şifre en az 6 karakter olmalı.', 'hata');
+      const dogrulama = kayitDogrula({ adSoyad, email, sifre, telefon });
+      if (!dogrulama.gecerli) return mesajGoster(dogrulama.hatalar[0], 'hata');
+      const kayitLimit = istemciRateLimit('kayit', 30);
+      if (!kayitLimit.izinli) return mesajGoster(`Lütfen ${kayitLimit.kalanSaniye} saniye bekleyin.`, 'hata');
       try {
         yukleniyorAyarla('kayit-btn', true);
         await kayitOl({ email, sifre, adSoyad, telefon, sehir });
