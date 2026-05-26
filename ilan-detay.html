@@ -2,13 +2,12 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <base href="/ilan-platformu/" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>İlan Detay — İlan Platformu</title>
-  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="/ilan-platformu/css/main.css" />
   <style>
     .detay-konteyner {
       max-width: 1100px;
@@ -275,10 +274,10 @@
   <!-- NAVBAR -->
   <nav class="navbar">
     <div class="navbar-ic">
-      <a href="index.html" class="navbar-logo">🏠 İlan Platformu</a>
+      <a href="/ilan-platformu/index.html" class="navbar-logo">🏠 İlan Platformu</a>
       <div class="navbar-saglar">
-        <a href="index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">← Geri</a>
-        <a href="giris.html" class="btn-birincil" id="nav-giris" style="font-size:.875rem;padding:.5rem 1rem">Giriş Yap</a>
+        <a href="/ilan-platformu/index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">← Geri</a>
+        <a href="/ilan-platformu/giris.html" class="btn-birincil" id="nav-giris" style="font-size:.875rem;padding:.5rem 1rem">Giriş Yap</a>
         <div class="nav-kullanici gizli" id="nav-kullanici">
           <div class="nav-avatar" id="nav-avatar">?</div>
           <span id="nav-kullanici-ad"></span>
@@ -388,15 +387,15 @@
       <div class="bos-durum-ikon">😕</div>
       <h3>İlan bulunamadı</h3>
       <p>Bu ilan kaldırılmış veya mevcut değil.</p>
-      <a href="index.html" class="btn-birincil" style="display:inline-flex;margin-top:1rem">Ana Sayfaya Dön</a>
+      <a href="/ilan-platformu/index.html" class="btn-birincil" style="display:inline-flex;margin-top:1rem">Ana Sayfaya Dön</a>
     </div>
   </div>
 
   <script type="module">
-    import { ilanGetir }                              from './js/ilanlar.js';
-    import { mevcutKullanici, navbarGuncelle, cikisYap } from './js/auth.js';
-    import { fiyatFormatla, tarihFormatla, toastBasari, toastHata, toastBilgi } from './js/ui.js';
-    import { supabase }                               from './js/config.js';
+    import { ilanGetir }                              from '/ilan-platformu/js/ilanlar.js';
+    import { mevcutKullanici, navbarGuncelle, cikisYap } from '/ilan-platformu/js/auth.js';
+    import { fiyatFormatla, tarihFormatla, toastBasari, toastHata, toastBilgi } from '/ilan-platformu/js/ui.js';
+    import { supabase }                               from '/ilan-platformu/js/config.js';
 
     const params  = new URLSearchParams(window.location.search);
     const ilanId  = params.get('id');
@@ -478,7 +477,7 @@
         } else if (!kullanici) {
           iletisimEl.innerHTML = `
             <p style="font-size:.8rem;color:#9ca3af;text-align:center">
-              İletişim bilgisini görmek için <a href="giris.html">giriş yapın</a>.
+              İletişim bilgisini görmek için <a href="/ilan-platformu/giris.html">giriş yapın</a>.
             </p>`;
         }
 
@@ -498,7 +497,7 @@
               const { ilanPasifYap } = await import('./js/ilanlar.js');
               await ilanPasifYap(ilanId);
               toastBasari('İlan pasife alındı.');
-              setTimeout(() => window.location.href = 'index.html', 1200);
+              setTimeout(() => window.location.href = '/ilan-platformu/index.html', 1200);
             } catch(e) { toastHata(e.message); }
           });
         }
@@ -519,7 +518,7 @@
             await mesajGonder(kullanici.id, ilan.user_id, ilanId, icerik);
             toastBasari('Mesajın gönderildi! 🎉');
             document.getElementById('mesaj-icerik').value = '';
-            setTimeout(() => window.location.href = 'mesajlar.html', 1200);
+            setTimeout(() => window.location.href = '/ilan-platformu/mesajlar.html', 1200);
           } catch(e) {
             toastHata('Mesaj gönderilemedi: ' + e.message);
           } finally {
