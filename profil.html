@@ -2,13 +2,12 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <base href="/ilan-platformu/" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Profilim — İlan Platformu</title>
-  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="/ilan-platformu/css/main.css" />
   <style>
     .profil-konteyner {
       max-width: 900px;
@@ -200,9 +199,9 @@
   <!-- NAVBAR -->
   <nav class="navbar">
     <div class="navbar-ic">
-      <a href="index.html" class="navbar-logo">🏠 İlan Platformu</a>
+      <a href="/ilan-platformu/index.html" class="navbar-logo">🏠 İlan Platformu</a>
       <div class="navbar-saglar">
-        <a href="index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">← Geri</a>
+        <a href="/ilan-platformu/index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">← Geri</a>
         <button id="cikis-btn" class="btn-link" style="color:#ef4444">Çıkış Yap</button>
       </div>
     </div>
@@ -238,7 +237,7 @@
     <div id="sekme-ilanlarim">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
         <h2 style="font-size:1rem;font-weight:700;color:#1f2937">İlanlarım</h2>
-        <a href="ilan-ver.html" class="btn-birincil" style="font-size:.875rem;padding:.5rem 1rem">+ Yeni İlan</a>
+        <a href="/ilan-platformu/ilan-ver.html" class="btn-birincil" style="font-size:.875rem;padding:.5rem 1rem">+ Yeni İlan</a>
       </div>
       <div class="benim-ilan-listesi" id="benim-ilan-listesi">
         <div class="yukleniyor-spinner"></div>
@@ -291,18 +290,18 @@
   </div>
 
   <script type="module">
-    import { profilGetir, profilGuncelle, avatarYukle } from './js/profil.js';
-    import { metinTemizle, telefonTemizle, telefonGecerliMi } from './js/validation.js';
-    import { benimIlanlarim, ilanGuncelle, ilanSil }    from './js/ilanlar.js';
-    import { mevcutKullanici, cikisYap }                from './js/auth.js';
-    import { toastBasari, toastHata, fiyatFormatla, tarihFormatla } from './js/ui.js';
-    import { supabase }                                 from './js/config.js';
+    import { profilGetir, profilGuncelle, avatarYukle } from '/ilan-platformu/js/profil.js';
+    import { metinTemizle, telefonTemizle, telefonGecerliMi } from '/ilan-platformu/js/validation.js';
+    import { benimIlanlarim, ilanGuncelle, ilanSil }    from '/ilan-platformu/js/ilanlar.js';
+    import { mevcutKullanici, cikisYap }                from '/ilan-platformu/js/auth.js';
+    import { toastBasari, toastHata, fiyatFormatla, tarihFormatla } from '/ilan-platformu/js/ui.js';
+    import { supabase }                                 from '/ilan-platformu/js/config.js';
 
     // Giriş kontrolü
     document.body.style.visibility = 'hidden';
     const kullanici = await mevcutKullanici();
     if (!kullanici) {
-      window.location.replace('giris.html?sonra=profil.html');
+      window.location.replace('/ilan-platformu/giris.html?sonra=/ilan-platformu/profil.html');
       throw new Error('Giriş gerekli');
     }
     document.body.style.visibility = 'visible';
@@ -374,7 +373,7 @@
               <div class="bos-durum-ikon">📋</div>
               <h3>Henüz ilanın yok</h3>
               <p>İlk ilanını vermek için aşağıdaki butona tıkla.</p>
-              <a href="ilan-ver.html" class="btn-birincil" style="display:inline-flex;margin-top:1rem">+ İlan Ver</a>
+              <a href="/ilan-platformu/ilan-ver.html" class="btn-birincil" style="display:inline-flex;margin-top:1rem">+ İlan Ver</a>
             </div>`;
           return;
         }
