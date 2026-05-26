@@ -87,8 +87,6 @@
     import { kayitDogrula, epostaGecerliMi, istemciRateLimit } from './js/validation.js';
 
     // ── Şifre sıfırlama modu kontrolü ──────────────────────
-    // Supabase reset linkinden gelince URL'de token olur
-    // onAuthStateChange ile PASSWORD_RECOVERY event'i yakalarız
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
         // Sekmeleri gizle, reset formunu göster
@@ -96,8 +94,19 @@
         document.getElementById('giris-formu').classList.add('gizli');
         document.getElementById('kayit-formu').classList.add('gizli');
         document.getElementById('sifre-guncelle-formu').classList.remove('gizli');
+      } else if (event === 'SIGNED_IN' && !document.getElementById('sifre-guncelle-formu').classList.contains('gizli') === false) {
+        // Normal giriş olduysa ve recovery modunda değilsek index'e yönlendir
+        window.location.href = 'index.html';
       }
     });
+
+    // URL hash'te recovery token varsa formu hemen göster
+    if (window.location.hash.includes('type=recovery')) {
+      document.querySelector('.auth-sekmeler').style.display = 'none';
+      document.getElementById('giris-formu').classList.add('gizli');
+      document.getElementById('kayit-formu').classList.add('gizli');
+      document.getElementById('sifre-guncelle-formu').classList.remove('gizli');
+    }
 
     // Şifre güncelle butonu
     document.getElementById('sifre-guncelle-btn').addEventListener('click', async () => {
@@ -119,8 +128,11 @@
     });
 
     // Zaten giriş yapmışsa ana sayfaya yönlendir
-    mevcutKullanici().then(k => {
-      if (k) window.location.href = 'index.html';
+    // Ama PASSWORD_RECOVERY modunda yönlendirme yapma
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session && !window.location.hash.includes('type=recovery')) {
+        window.location.href = 'index.html';
+      }
     });
 
     // Sekme geçişi
