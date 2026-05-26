@@ -73,8 +73,8 @@ export function ilanDogrula({ kategoriId, baslik, aciklama, fiyat, sehir, ilce }
   const temizAciklama = metinTemizle(aciklama, 2000);
   if (!temizAciklama) {
     hatalar.push('Açıklama zorunludur.');
-  } else if (temizAciklama.length < 20) {
-    hatalar.push('Açıklama en az 20 karakter olmalıdır.');
+  } else if (temizAciklama.length < 10) {
+    hatalar.push('Açıklama en az 10 karakter olmalıdır.');
   }
 
   if (fiyat && !fiyatGecerliMi(fiyat)) {
@@ -137,7 +137,7 @@ export function mesajDogrula(icerik) {
 // ── Rate limit (basit client-side) ───────────────────────
 //    Aynı kullanıcının kısa sürede çok istek atmasını önler
 const istemciLimitler = {};
-export function istemciRateLimit(anahtar, limitSaniye = 60) {
+export function istemciRateLimit(anahtar, limitSaniye = 5) {
   const simdi = Date.now();
   const sonIstek = istemciLimitler[anahtar] || 0;
   if (simdi - sonIstek < limitSaniye * 1000) {
