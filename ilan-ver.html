@@ -2,13 +2,12 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <base href="/ilan-platformu/" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>İlan Ver — İlan Platformu</title>
-  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="/ilan-platformu/css/main.css" />
   <style>
     .sayfa-baslik {
       background: linear-gradient(135deg, #e0f2fe 0%, #faf9ff 100%);
@@ -170,9 +169,9 @@
   <!-- NAVBAR -->
   <nav class="navbar">
     <div class="navbar-ic">
-      <a href="index.html" class="navbar-logo">🏠 İlan Platformu</a>
+      <a href="/ilan-platformu/index.html" class="navbar-logo">🏠 İlan Platformu</a>
       <div class="navbar-saglar">
-        <a href="index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">← Geri</a>
+        <a href="/ilan-platformu/index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">← Geri</a>
       </div>
     </div>
   </nav>
@@ -269,17 +268,17 @@
   </div>
 
   <script type="module">
-    import { kategorileriGetir, ilanOlustur } from './js/ilanlar.js';
-    import { ilanDogrula, istemciRateLimit } from './js/validation.js';
-    import { mevcutKullanici }                from './js/auth.js';
-    import { toastBasari, toastHata, btnYukleniyor } from './js/ui.js';
-    import { supabase }                       from './js/config.js';
+    import { kategorileriGetir, ilanOlustur } from '/ilan-platformu/js/ilanlar.js';
+    import { ilanDogrula, istemciRateLimit } from '/ilan-platformu/js/validation.js';
+    import { mevcutKullanici }                from '/ilan-platformu/js/auth.js';
+    import { toastBasari, toastHata, btnYukleniyor } from '/ilan-platformu/js/ui.js';
+    import { supabase }                       from '/ilan-platformu/js/config.js';
 
     // Giriş kontrolü — sayfa içeriğini gizle, oturum yoksa yönlendir
     document.body.style.visibility = 'hidden';
     const kullanici = await mevcutKullanici();
     if (!kullanici) {
-      window.location.replace('giris.html?sonra=ilan-ver.html');
+      window.location.replace('/ilan-platformu/giris.html?sonra=/ilan-platformu/ilan-ver.html');
       throw new Error('Giriş gerekli');
     }
     document.body.style.visibility = 'visible';
