@@ -2,12 +2,11 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <base href="/ilan-platformu/" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Paneli — İlan Platformu</title>
-  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="/ilan-platformu/css/main.css" />
   <style>
     .admin-layout {
       display: grid;
@@ -213,10 +212,10 @@
   <!-- NAVBAR -->
   <nav class="navbar">
     <div class="navbar-ic">
-      <a href="index.html" class="navbar-logo">🏠 İlan Platformu</a>
+      <a href="/ilan-platformu/index.html" class="navbar-logo">🏠 İlan Platformu</a>
       <div class="navbar-saglar">
         <span style="font-size:.8rem;color:#6b7280;font-weight:600">🔐 Admin Paneli</span>
-        <a href="index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">Siteye Dön</a>
+        <a href="/ilan-platformu/index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">Siteye Dön</a>
         <button id="cikis-btn" class="btn-link" style="color:#ef4444">Çıkış</button>
       </div>
     </div>
@@ -305,21 +304,21 @@
   </div>
 
   <script type="module">
-    import { mevcutKullanici, cikisYap } from './js/auth.js';
-    import { supabase }                  from './js/config.js';
-    import { tarihFormatla }             from './js/ui.js';
+    import { mevcutKullanici, cikisYap } from '/ilan-platformu/js/auth.js';
+    import { supabase }                  from '/ilan-platformu/js/config.js';
+    import { tarihFormatla }             from '/ilan-platformu/js/ui.js';
 
     // ── Admin kontrolü ───────────────────────────────────────
     document.body.style.visibility = 'hidden';
     const kullanici = await mevcutKullanici();
     if (!kullanici) {
-      window.location.replace('giris.html');
+      window.location.replace('/ilan-platformu/giris.html');
       throw new Error('Giriş gerekli');
     }
     const { data: profil } = await supabase
       .from('profiles').select('rol').eq('id', kullanici.id).single();
     if (!profil || profil.rol !== 'admin') {
-      window.location.replace('index.html');
+      window.location.replace('/ilan-platformu/index.html');
       throw new Error('Admin yetkisi gerekli');
     }
     document.body.style.visibility = 'visible';
@@ -442,7 +441,7 @@
         <tbody>
           ${rows.map(s => `<tr data-sikayet-id="${s.id}" data-ilan-id="${s.ilanlar?.id}">
             <td class="td-baslik">
-              <a href="ilan-detay.html?id=${s.ilanlar?.id}" target="_blank">${s.ilanlar?.baslik ?? '—'}</a>
+              <a href="/ilan-platformu/ilan-detay.html?id=${s.ilanlar?.id}" target="_blank">${s.ilanlar?.baslik ?? '—'}</a>
               <br><span class="etiket etiket-${s.ilanlar?.durum ?? 'pasif'}">${s.ilanlar?.durum ?? '—'}</span>
               ${s.ilanlar?.sikayet_sayisi > 1 ? `<span class="etiket etiket-sikayet">${s.ilanlar.sikayet_sayisi} şikayet</span>` : ''}
             </td>
@@ -506,7 +505,7 @@
         <tbody>
           ${ilanlar.map(i => `<tr>
             <td class="td-baslik">
-              <a href="ilan-detay.html?id=${i.id}" target="_blank">${i.baslik}</a>
+              <a href="/ilan-platformu/ilan-detay.html?id=${i.id}" target="_blank">${i.baslik}</a>
             </td>
             <td>${i.kategoriler?.ikon ?? ''} ${i.kategoriler?.ad ?? '—'}</td>
             <td>${i.profiles?.ad_soyad ?? '—'}</td>
