@@ -44,7 +44,7 @@ export async function girisYap({ email, sifre }) {
 export async function cikisYap() {
   const { error } = await supabase.auth.signOut();
   if (error) throw error;
-  window.location.href = 'index.html';
+  window.location.href = '/ilan-platformu/index.html';
 }
 
 // ── Mevcut kullanıcıyı al ────────────────────────────────
