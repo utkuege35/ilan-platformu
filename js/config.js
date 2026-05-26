@@ -5,7 +5,7 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-const SUPABASE_URL  = 'BURAYA_PROJECT_URL_YAZIN';   // örn: https://lxdtevdm....supabase.co
+const SUPABASE_URL  = 'https://lxdtevdmdaohbuuodzio.supabase.co';   // örn: https://lxdtevdm....supabase.co
 const SUPABASE_KEY  = 'BURAYA_PUBLISHABLE_KEY_YAZIN'; // sb_publishable_...
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
