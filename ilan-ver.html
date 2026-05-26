@@ -387,7 +387,7 @@
       const ilce        = document.getElementById('ilce').value.trim();
 
       // Rate limit kontrolü
-      const limit = istemciRateLimit('ilan-olustur', 30);
+      const limit = istemciRateLimit('ilan-olustur', 5);
       if (!limit.izinli) return toastHata(`Lütfen ${limit.kalanSaniye} saniye bekleyin.`);
 
       // Doğrulama
