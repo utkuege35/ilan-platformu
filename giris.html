@@ -2,18 +2,17 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <base href="/ilan-platformu/" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Giriş Yap — İlan Platformu</title>
-  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="/ilan-platformu/css/main.css" />
 </head>
 <body class="auth-sayfa">
 
   <div class="auth-kart">
-    <a href="index.html" class="auth-logo">🏠 İlan Platformu</a>
+    <a href="/ilan-platformu/index.html" class="auth-logo">🏠 İlan Platformu</a>
 
     <!-- Sekme -->
     <div class="auth-sekmeler">
@@ -82,9 +81,9 @@
   </div>
 
   <script type="module">
-    import { girisYap, kayitOl, sifreSifirla, sifreGuncelle, mevcutKullanici } from './js/auth.js';
-    import { supabase } from './js/config.js';
-    import { kayitDogrula, epostaGecerliMi, istemciRateLimit } from './js/validation.js';
+    import { girisYap, kayitOl, sifreSifirla, sifreGuncelle, mevcutKullanici } from '/ilan-platformu/js/auth.js';
+    import { supabase } from '/ilan-platformu/js/config.js';
+    import { kayitDogrula, epostaGecerliMi, istemciRateLimit } from '/ilan-platformu/js/validation.js';
 
     // ── Şifre sıfırlama modu kontrolü ──────────────────────
     supabase.auth.onAuthStateChange(async (event, session) => {
@@ -96,7 +95,7 @@
         document.getElementById('sifre-guncelle-formu').classList.remove('gizli');
       } else if (event === 'SIGNED_IN' && !document.getElementById('sifre-guncelle-formu').classList.contains('gizli') === false) {
         // Normal giriş olduysa ve recovery modunda değilsek index'e yönlendir
-        window.location.href = 'index.html';
+        window.location.href = '/ilan-platformu/index.html';
       }
     });
 
@@ -119,7 +118,7 @@
         btn.disabled = true; btn.textContent = 'Güncelleniyor...';
         await sifreGuncelle(yeniSifre);
         mesajGoster('Şifreniz güncellendi! Yönlendiriliyorsunuz...', 'basari');
-        setTimeout(() => window.location.href = 'index.html', 2000);
+        setTimeout(() => window.location.href = '/ilan-platformu/index.html', 2000);
       } catch(e) {
         mesajGoster(e.message, 'hata');
         document.getElementById('sifre-guncelle-btn').disabled = false;
@@ -131,7 +130,7 @@
     // Ama PASSWORD_RECOVERY modunda yönlendirme yapma
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session && !window.location.hash.includes('type=recovery')) {
-        window.location.href = 'index.html';
+        window.location.href = '/ilan-platformu/index.html';
       }
     });
 
@@ -158,7 +157,7 @@
       try {
         yukleniyorAyarla('giris-btn', true);
         await girisYap({ email, sifre });
-        window.location.href = 'index.html';
+        window.location.href = '/ilan-platformu/index.html';
       } catch (e) {
         mesajGoster(hataMetni(e), 'hata');
       } finally {
