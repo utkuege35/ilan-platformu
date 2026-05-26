@@ -2,13 +2,12 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <base href="/ilan-platformu/" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Mesajlar — İlan Platformu</title>
-  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="/ilan-platformu/css/main.css" />
   <style>
     .inbox-sayfa {
       max-width: 1100px;
@@ -261,9 +260,9 @@
   <!-- NAVBAR -->
   <nav class="navbar">
     <div class="navbar-ic">
-      <a href="index.html" class="navbar-logo">🏠 İlan Platformu</a>
+      <a href="/ilan-platformu/index.html" class="navbar-logo">🏠 İlan Platformu</a>
       <div class="navbar-saglar">
-        <a href="index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">← Geri</a>
+        <a href="/ilan-platformu/index.html" class="btn-ikincil" style="font-size:.875rem;padding:.5rem 1rem">← Geri</a>
       </div>
     </div>
   </nav>
@@ -289,17 +288,17 @@
   </div>
 
   <script type="module">
-    import { konusmalariGetir, mesajlariGetir, mesajGonder, okunduYap, mesajlariDinle } from './js/mesajlar.js';
-    import { mesajDogrula, istemciRateLimit } from './js/validation.js';
-    import { mevcutKullanici }    from './js/auth.js';
-    import { tarihFormatla }      from './js/ui.js';
-    import { supabase }           from './js/config.js';
+    import { konusmalariGetir, mesajlariGetir, mesajGonder, okunduYap, mesajlariDinle } from '/ilan-platformu/js/mesajlar.js';
+    import { mesajDogrula, istemciRateLimit } from '/ilan-platformu/js/validation.js';
+    import { mevcutKullanici }    from '/ilan-platformu/js/auth.js';
+    import { tarihFormatla }      from '/ilan-platformu/js/ui.js';
+    import { supabase }           from '/ilan-platformu/js/config.js';
 
     // Giriş kontrolü
     document.body.style.visibility = 'hidden';
     const kullanici = await mevcutKullanici();
     if (!kullanici) {
-      window.location.replace('giris.html?sonra=mesajlar.html');
+      window.location.replace('/ilan-platformu/giris.html?sonra=/ilan-platformu/mesajlar.html');
       throw new Error('Giriş gerekli');
     }
     document.body.style.visibility = 'visible';
@@ -320,7 +319,7 @@
           liste.innerHTML = `
             <div style="padding:2rem 1.25rem;text-align:center;color:#9ca3af;font-size:.875rem">
               Henüz mesajın yok.<br>
-              <a href="index.html" style="color:var(--renk-birincil)">İlanlara göz at</a>
+              <a href="/ilan-platformu/index.html" style="color:var(--renk-birincil)">İlanlara göz at</a>
             </div>`;
           return;
         }
@@ -396,7 +395,7 @@
           <div class="mesaj-baslik-bilgi">
             <div class="mesaj-baslik-ad">${karsiTaraf?.ad_soyad ?? 'Kullanıcı'}</div>
             <div class="mesaj-baslik-ilan">
-              <a href="ilan-detay.html?id=${ilan?.id ?? ''}" style="color:#0ea5e9">
+              <a href="/ilan-platformu/ilan-detay.html?id=${ilan?.id ?? ''}" style="color:#0ea5e9">
                 ${ilan?.kategoriler?.ikon ?? ''} ${ilan?.baslik ?? 'İlan'}
               </a>
             </div>
