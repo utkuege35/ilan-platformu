@@ -88,7 +88,7 @@ export function ilanKartHTML(ilan) {
   const fotograf = ilan.ilan_fotograflari?.[0]?.url;
   const fiyatMetin = fiyatFormatla(ilan.fiyat, ilan.fiyat_birimi);
   return `
-    <a href="/ilan-detay.html?id=${ilan.id}" class="kart ilan-kart">
+    <a href="ilan-detay.html?id=${ilan.id}" class="kart ilan-kart">
       <div class="ilan-kart-fotograf">
         ${fotograf
           ? `<img src="${fotograf}" alt="${ilan.baslik}" loading="lazy" />`
