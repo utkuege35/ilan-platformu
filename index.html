@@ -2,13 +2,12 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <base href="/ilan-platformu/" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>İlan Platformu — Hizmet ve Ürün İlanları</title>
-  <link rel="stylesheet" href="css/main.css" />
+  <link rel="stylesheet" href="/ilan-platformu/css/main.css" />
   <style>
     /* ── Hero ──────────────────────────────────────────────── */
     .hero {
@@ -155,24 +154,24 @@
   <!-- NAVBAR -->
   <nav class="navbar">
     <div class="navbar-ic">
-      <a href="index.html" class="navbar-logo">🏠 İlan Platformu</a>
+      <a href="/ilan-platformu/index.html" class="navbar-logo">🏠 İlan Platformu</a>
       <div class="navbar-arama">
         <span class="arama-ikon">🔍</span>
         <input type="text" id="navbar-arama" placeholder="Hizmet veya ürün ara..." />
       </div>
       <div class="navbar-saglar">
-        <a href="ilan-ver.html" class="btn-birincil" style="font-size:.875rem;padding:.5rem 1rem">
+        <a href="/ilan-platformu/ilan-ver.html" class="btn-birincil" style="font-size:.875rem;padding:.5rem 1rem">
           + İlan Ver
         </a>
-        <a href="giris.html" class="btn-ikincil" id="nav-giris" style="font-size:.875rem;padding:.5rem 1rem">
+        <a href="/ilan-platformu/giris.html" class="btn-ikincil" id="nav-giris" style="font-size:.875rem;padding:.5rem 1rem">
           Giriş Yap
         </a>
         <div class="nav-kullanici gizli" id="nav-kullanici">
           <div class="nav-avatar" id="nav-avatar">?</div>
           <span id="nav-kullanici-ad"></span>
           <div class="nav-dropdown" id="nav-dropdown-menu" style="display:none;position:absolute;top:56px;right:1.5rem;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.1);padding:.5rem;min-width:160px;z-index:200;">
-            <a href="profil.html" style="display:block;padding:.6rem .875rem;border-radius:8px;color:#374151;font-size:.9rem;text-decoration:none;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">👤 Profilim</a>
-            <a href="mesajlar.html" style="display:block;padding:.6rem .875rem;border-radius:8px;color:#374151;font-size:.9rem;text-decoration:none;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">💬 Mesajlarım</a>
+            <a href="/ilan-platformu/profil.html" style="display:block;padding:.6rem .875rem;border-radius:8px;color:#374151;font-size:.9rem;text-decoration:none;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">👤 Profilim</a>
+            <a href="/ilan-platformu/mesajlar.html" style="display:block;padding:.6rem .875rem;border-radius:8px;color:#374151;font-size:.9rem;text-decoration:none;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">💬 Mesajlarım</a>
             <hr style="border:none;border-top:1px solid #e5e7eb;margin:.25rem 0;" />
             <button id="cikis-btn" style="display:block;width:100%;text-align:left;padding:.6rem .875rem;border-radius:8px;color:#ef4444;font-size:.9rem;background:none;border:none;cursor:pointer;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">🚪 Çıkış Yap</button>
           </div>
@@ -226,9 +225,9 @@
   </main>
 
   <script type="module">
-    import { ilanlariGetir, kategorileriGetir, sehirleriGetir } from './js/ilanlar.js';
-    import { navbarGuncelle, cikisYap }                         from './js/auth.js';
-    import { ilanKartHTML, bosDurumGoster }                     from './js/ui.js';
+    import { ilanlariGetir, kategorileriGetir, sehirleriGetir } from '/ilan-platformu/js/ilanlar.js';
+    import { navbarGuncelle, cikisYap }                         from '/ilan-platformu/js/auth.js';
+    import { ilanKartHTML, bosDurumGoster }                     from '/ilan-platformu/js/ui.js';
 
     // Durum
     let aktifKategori = '';
