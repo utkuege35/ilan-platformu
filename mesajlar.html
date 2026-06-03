@@ -423,19 +423,34 @@
       const textarea  = document.getElementById('yeni-mesaj');
       const gonderBtn = document.getElementById('mesaj-gonder-btn');
 
+      let gonderiliyor = false;
       async function gonder() {
-        const { gecerli, hata, temiz } = mesajDogrula(textarea.value);
+        if (gonderiliyor) return;
+        const { gecerli, temiz } = mesajDogrula(textarea.value);
         if (!gecerli) return;
-        const limit = istemciRateLimit('mesaj-gonder', 3);
-        if (!limit.izinli) return;
+        gonderiliyor = true;
         gonderBtn.disabled = true;
+        const icerik = temiz;
+        textarea.value = '';
+        textarea.style.height = 'auto';
+        // Kendi mesajını hemen ekle (optimistic UI)
+        const liste = document.getElementById('mesaj-listesi');
+        if (liste) {
+          ekleBalon(liste, {
+            id: 'temp-' + Date.now(),
+            icerik,
+            gonderen_id: kullanici.id,
+            created_at: new Date().toISOString()
+          }, kullanici.id);
+          liste.scrollTop = liste.scrollHeight;
+        }
         try {
-          await mesajGonder(konusmaId, kullanici.id, temiz);
-          textarea.value = '';
-          textarea.style.height = 'auto';
+          await mesajGonder(konusmaId, kullanici.id, icerik);
         } catch(e) {
           alert('Gönderilemedi: ' + e.message);
+          textarea.value = icerik; // hata olursa geri koy
         } finally {
+          gonderiliyor = false;
           gonderBtn.disabled = false;
           textarea.focus();
         }
@@ -452,7 +467,7 @@
 
       // Realtime dinle
       aktifKanal = mesajlariDinle(konusmaId, async (yeniMesaj) => {
-        // Kendi gönderdiğimizse zaten ekledik, atla
+        // Kendi gönderdiğimizse optimistic UI ile zaten ekledik, atla
         if (yeniMesaj.gonderen_id === kullanici.id) return;
         // Karşı tarafın gönderdiğini ekle
         const liste = document.getElementById('mesaj-listesi');
