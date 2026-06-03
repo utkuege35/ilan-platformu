@@ -10,22 +10,11 @@ export async function kayitOl({ email, sifre, adSoyad, telefon, sehir }) {
     email,
     password: sifre,
     options: {
-      data: { ad_soyad: adSoyad }   // tetikleyici profiles'a yazar
+      data: { ad_soyad: adSoyad, telefon, sehir }
     }
   });
 
   if (error) throw error;
-
-  // Profili güncelle (telefon, şehir tetikleyicide yok)
-  if (data.user) {
-    const { error: profilError } = await supabase
-      .from('profiles')
-      .update({ telefon, sehir })
-      .eq('id', data.user.id);
-
-    if (profilError) throw profilError;
-  }
-
   return data;
 }
 
