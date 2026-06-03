@@ -88,13 +88,11 @@
     // ── Şifre sıfırlama modu kontrolü ──────────────────────
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
-        // Sekmeleri gizle, reset formunu göster
         document.querySelector('.auth-sekmeler').style.display = 'none';
         document.getElementById('giris-formu').classList.add('gizli');
         document.getElementById('kayit-formu').classList.add('gizli');
         document.getElementById('sifre-guncelle-formu').classList.remove('gizli');
       } else if (event === 'SIGNED_IN' && !document.getElementById('sifre-guncelle-formu').classList.contains('gizli') === false) {
-        // Normal giriş olduysa ve recovery modunda değilsek index'e yönlendir
         window.location.href = '/ilan-platformu/index.html';
       }
     });
@@ -109,7 +107,7 @@
 
     // Şifre güncelle butonu
     document.getElementById('sifre-guncelle-btn').addEventListener('click', async () => {
-      const yeniSifre      = document.getElementById('yeni-sifre').value;
+      const yeniSifre       = document.getElementById('yeni-sifre').value;
       const yeniSifreTekrar = document.getElementById('yeni-sifre-tekrar').value;
       if (yeniSifre.length < 6) return mesajGoster('Şifre en az 6 karakter olmalı.', 'hata');
       if (yeniSifre !== yeniSifreTekrar) return mesajGoster('Şifreler eşleşmiyor.', 'hata');
@@ -127,7 +125,6 @@
     });
 
     // Zaten giriş yapmışsa ana sayfaya yönlendir
-    // Ama PASSWORD_RECOVERY modunda yönlendirme yapma
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session && !window.location.hash.includes('type=recovery')) {
         window.location.href = '/ilan-platformu/index.html';
@@ -143,6 +140,28 @@
         document.getElementById('giris-formu').classList.toggle('gizli', hedef !== 'giris');
         document.getElementById('kayit-formu').classList.toggle('gizli', hedef !== 'kayit');
         mesajTemizle();
+      });
+    });
+
+    // ── Enter tuşu desteği ──────────────────────────────────
+    // Giriş formunda tüm alanlarda Enter = giriş yap
+    ['giris-email', 'giris-sifre'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') document.getElementById('giris-btn').click();
+      });
+    });
+
+    // Kayıt formunda tüm alanlarda Enter = kayıt ol
+    ['kayit-ad', 'kayit-email', 'kayit-telefon', 'kayit-sehir', 'kayit-sifre'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') document.getElementById('kayit-btn').click();
+      });
+    });
+
+    // Yeni şifre formunda Enter = güncelle
+    ['yeni-sifre', 'yeni-sifre-tekrar'].forEach(id => {
+      document.getElementById(id).addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') document.getElementById('sifre-guncelle-btn').click();
       });
     });
 
@@ -167,11 +186,11 @@
 
     // Kayıt
     document.getElementById('kayit-btn').addEventListener('click', async () => {
-      const adSoyad  = document.getElementById('kayit-ad').value.trim();
-      const email    = document.getElementById('kayit-email').value.trim();
-      const telefon  = document.getElementById('kayit-telefon').value.trim();
-      const sehir    = document.getElementById('kayit-sehir').value.trim();
-      const sifre    = document.getElementById('kayit-sifre').value;
+      const adSoyad = document.getElementById('kayit-ad').value.trim();
+      const email   = document.getElementById('kayit-email').value.trim();
+      const telefon = document.getElementById('kayit-telefon').value.trim();
+      const sehir   = document.getElementById('kayit-sehir').value.trim();
+      const sifre   = document.getElementById('kayit-sifre').value;
       const dogrulama = kayitDogrula({ adSoyad, email, sifre, telefon });
       if (!dogrulama.gecerli) return mesajGoster(dogrulama.hatalar[0], 'hata');
       const kayitLimit = istemciRateLimit('kayit', 30);
