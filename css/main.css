@@ -1,17 +1,17 @@
 /* ============================================================
-   main.css — Pastel tema, mobil uyumlu
+   main.css — Pastel tema, dark mode, mobil uyumlu
    ============================================================ */
 
-/* ── Değişkenler ──────────────────────────────────────────── */
+/* ── Light mod değişkenleri ───────────────────────────────── */
 :root {
-  --renk-birincil:    #0ea5e9;      /* okyanus mavisi - ana renk */
-  --renk-birincil-ac: #e0f2fe;      /* mavi açık */
-  --renk-ikincil:     #0284c7;      /* koyu mavi */
+  --renk-birincil:    #0ea5e9;
+  --renk-birincil-ac: #e0f2fe;
+  --renk-ikincil:     #0284c7;
   --renk-basari:      #10b981;
   --renk-hata:        #ef4444;
   --renk-uyari:       #f59e0b;
 
-  --renk-arka:        #f0f9ff;      /* sayfa arka planı - çok açık mavi */
+  --renk-arka:        #f0f9ff;
   --renk-kart:        #ffffff;
   --renk-kenar:       #e5e7eb;
   --renk-kenar-ac:    #f3f4f6;
@@ -30,6 +30,36 @@
 
   --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
   --max-genislik: 1200px;
+
+  --navbar-bg:    #ffffff;
+  --input-bg:     #ffffff;
+  --auth-bg:      linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 50%, #e0f7fa 100%);
+  --auth-kart-bg: #ffffff;
+}
+
+/* ── Dark mod değişkenleri ────────────────────────────────── */
+[data-tema="dark"] {
+  --renk-birincil:    #38bdf8;
+  --renk-birincil-ac: #0c4a6e;
+  --renk-ikincil:     #7dd3fc;
+
+  --renk-arka:        #0f172a;
+  --renk-kart:        #1e293b;
+  --renk-kenar:       #334155;
+  --renk-kenar-ac:    #1e293b;
+
+  --renk-yazi:        #f1f5f9;
+  --renk-yazi-ikincil:#94a3b8;
+  --renk-yazi-uc:     #64748b;
+
+  --golge-sm: 0 1px 3px rgba(0,0,0,.3);
+  --golge-md: 0 4px 16px rgba(0,0,0,.4);
+  --golge-lg: 0 8px 32px rgba(0,0,0,.5);
+
+  --navbar-bg:    #1e293b;
+  --input-bg:     #0f172a;
+  --auth-bg:      linear-gradient(135deg, #0c4a6e 0%, #0f172a 50%, #0c4a6e 100%);
+  --auth-kart-bg: #1e293b;
 }
 
 /* ── Reset ────────────────────────────────────────────────── */
@@ -41,6 +71,7 @@ body {
   color: var(--renk-yazi);
   line-height: 1.6;
   min-height: 100vh;
+  transition: background .3s, color .3s;
 }
 img { max-width: 100%; display: block; }
 a  { color: var(--renk-birincil); text-decoration: none; }
@@ -55,6 +86,27 @@ input, textarea, select {
 .gizli { display: none !important; }
 .tam   { width: 100%; }
 .merkez { text-align: center; }
+
+/* ── Dark mode toggle butonu ──────────────────────────────── */
+.tema-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--renk-kenar);
+  background: var(--renk-kart);
+  color: var(--renk-yazi-ikincil);
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s;
+  flex-shrink: 0;
+}
+.tema-toggle:hover {
+  border-color: var(--renk-birincil);
+  color: var(--renk-birincil);
+}
 
 /* ── Butonlar ─────────────────────────────────────────────── */
 .btn-birincil {
@@ -71,7 +123,7 @@ input, textarea, select {
   font-weight: 600;
   transition: background .2s, transform .1s;
 }
-.btn-birincil:hover  { background: #0284c7; }
+.btn-birincil:hover  { background: var(--renk-ikincil); }
 .btn-birincil:active { transform: scale(.98); }
 .btn-birincil:disabled { opacity: .6; cursor: not-allowed; }
 
@@ -99,7 +151,7 @@ input, textarea, select {
   padding: .25rem 0;
   text-decoration: underline;
 }
-.btn-link:hover { color: #0284c7; }
+.btn-link:hover { color: var(--renk-ikincil); }
 
 /* ── Form elemanları ──────────────────────────────────────── */
 .form-grup {
@@ -120,27 +172,28 @@ input, textarea, select {
   border: 1.5px solid var(--renk-kenar);
   border-radius: var(--yaricap);
   font-size: .95rem;
-  background: #fff;
+  background: var(--input-bg);
   color: var(--renk-yazi);
-  transition: border-color .2s, box-shadow .2s;
+  transition: border-color .2s, box-shadow .2s, background .3s;
   outline: none;
 }
 .form-grup input:focus,
 .form-grup textarea:focus,
 .form-grup select:focus {
   border-color: var(--renk-birincil);
-  box-shadow: 0 0 0 3px rgba(124,58,237,.12);
+  box-shadow: 0 0 0 3px rgba(14,165,233,.15);
 }
 .form-grup textarea { resize: vertical; min-height: 120px; }
 
 /* ── Navbar ───────────────────────────────────────────────── */
 .navbar {
-  background: #fff;
+  background: var(--navbar-bg);
   border-bottom: 1px solid var(--renk-kenar);
   position: sticky;
   top: 0;
   z-index: 100;
   box-shadow: var(--golge-sm);
+  transition: background .3s, border-color .3s;
 }
 .navbar-ic {
   max-width: var(--max-genislik);
@@ -170,8 +223,9 @@ input, textarea, select {
   border-radius: 99px;
   font-size: .9rem;
   background: var(--renk-arka);
+  color: var(--renk-yazi);
   outline: none;
-  transition: border-color .2s;
+  transition: border-color .2s, background .3s;
 }
 .navbar-arama input:focus { border-color: var(--renk-birincil); }
 .navbar-arama .arama-ikon {
@@ -218,15 +272,17 @@ input, textarea, select {
   justify-content: center;
   min-height: 100vh;
   padding: 2rem 1rem;
-  background: linear-gradient(135deg, #ede9fe 0%, #faf9ff 50%, #e0f2fe 100%);
+  background: var(--auth-bg);
+  transition: background .3s;
 }
 .auth-kart {
-  background: #fff;
+  background: var(--auth-kart-bg);
   border-radius: var(--yaricap-xl);
   box-shadow: var(--golge-lg);
   padding: 2.5rem;
   width: 100%;
   max-width: 440px;
+  transition: background .3s;
 }
 .auth-logo {
   display: block;
@@ -268,6 +324,9 @@ input, textarea, select {
 .auth-mesaj.hata    { background: #fef2f2; color: #dc2626; }
 .auth-mesaj.basari  { background: #f0fdf4; color: #16a34a; }
 
+[data-tema="dark"] .auth-mesaj.hata   { background: #450a0a; color: #fca5a5; }
+[data-tema="dark"] .auth-mesaj.basari { background: #052e16; color: #86efac; }
+
 /* ── Kart bileşeni ────────────────────────────────────────── */
 .kart {
   background: var(--renk-kart);
@@ -275,7 +334,7 @@ input, textarea, select {
   border-radius: var(--yaricap-lg);
   box-shadow: var(--golge-sm);
   overflow: hidden;
-  transition: box-shadow .2s, transform .2s;
+  transition: box-shadow .2s, transform .2s, background .3s;
 }
 .kart:hover {
   box-shadow: var(--golge-md);
@@ -383,6 +442,11 @@ input, textarea, select {
 .toast.basari { background: #f0fdf4; color: #15803d; border-left: 4px solid #22c55e; }
 .toast.hata   { background: #fef2f2; color: #dc2626; border-left: 4px solid #ef4444; }
 .toast.bilgi  { background: #eff6ff; color: #1d4ed8; border-left: 4px solid #3b82f6; }
+
+[data-tema="dark"] .toast.basari { background: #052e16; color: #86efac; }
+[data-tema="dark"] .toast.hata   { background: #450a0a; color: #fca5a5; }
+[data-tema="dark"] .toast.bilgi  { background: #0c1a4e; color: #93c5fd; }
+
 @keyframes toast-gir {
   from { opacity: 0; transform: translateX(1rem); }
   to   { opacity: 1; transform: translateX(0); }
