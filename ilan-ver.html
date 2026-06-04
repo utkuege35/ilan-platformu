@@ -2,6 +2,13 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    (function() {
+      const t = localStorage.getItem('tema-tercihi') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-tema', t);
+    })();
+  </script>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -10,19 +17,23 @@
   <link rel="stylesheet" href="/ilan-platformu/css/main.css" />
   <style>
     .sayfa-baslik {
-      background: linear-gradient(135deg, #e0f2fe 0%, #faf9ff 100%);
+      background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 100%);
       padding: 2rem 1.5rem;
-      border-bottom: 1px solid #e5e7eb;
+      border-bottom: 1px solid var(--renk-kenar);
+      transition: background .3s;
+    }
+    [data-tema="dark"] .sayfa-baslik {
+      background: linear-gradient(135deg, #0c4a6e 0%, #0f172a 100%);
     }
     .sayfa-baslik h1 {
       font-size: 1.75rem;
       font-weight: 800;
-      color: #1f2937;
+      color: var(--renk-yazi);
       max-width: 760px;
       margin: 0 auto;
     }
     .sayfa-baslik p {
-      color: #6b7280;
+      color: var(--renk-yazi-ikincil);
       margin-top: .35rem;
       max-width: 760px;
       margin-left: auto;
@@ -36,25 +47,25 @@
     }
 
     .form-bolum {
-      background: #fff;
-      border: 1px solid #e5e7eb;
+      background: var(--renk-kart);
+      border: 1px solid var(--renk-kenar);
       border-radius: 16px;
       padding: 1.75rem;
       margin-bottom: 1.25rem;
+      transition: background .3s;
     }
     .form-bolum-baslik {
       font-size: 1rem;
       font-weight: 700;
-      color: #1f2937;
+      color: var(--renk-yazi);
       margin-bottom: 1.25rem;
       padding-bottom: .75rem;
-      border-bottom: 1px solid #f3f4f6;
+      border-bottom: 1px solid var(--renk-kenar);
       display: flex;
       align-items: center;
       gap: .5rem;
     }
 
-    /* Kategori seçici */
     .kategori-secici {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -66,22 +77,21 @@
       align-items: center;
       gap: .4rem;
       padding: .875rem .5rem;
-      border: 2px solid #e5e7eb;
+      border: 2px solid var(--renk-kenar);
       border-radius: 12px;
-      background: #fff;
+      background: var(--renk-kart);
       cursor: pointer;
       transition: border-color .2s, background .2s;
       font-size: .875rem;
       font-weight: 600;
-      color: #374151;
+      color: var(--renk-yazi);
     }
-    .kategori-kart:hover { border-color: #38bdf8; background: #faf5ff; }
-    .kategori-kart.secili { border-color: var(--renk-birincil); background: #e0f2fe; color: var(--renk-birincil); }
+    .kategori-kart:hover { border-color: var(--renk-birincil); background: var(--renk-birincil-ac); }
+    .kategori-kart.secili { border-color: var(--renk-birincil); background: var(--renk-birincil-ac); color: var(--renk-birincil); }
     .kategori-kart .ikon { font-size: 1.75rem; }
 
-    /* Fotoğraf yükleme */
     .fotograf-alani {
-      border: 2px dashed #d1d5db;
+      border: 2px dashed var(--renk-kenar);
       border-radius: 12px;
       padding: 2rem;
       text-align: center;
@@ -89,10 +99,10 @@
       transition: border-color .2s, background .2s;
       position: relative;
     }
-    .fotograf-alani:hover { border-color: var(--renk-birincil); background: #faf5ff; }
+    .fotograf-alani:hover { border-color: var(--renk-birincil); background: var(--renk-birincil-ac); }
     .fotograf-alani input { display: none; }
     .fotograf-alani-ikon { font-size: 2.5rem; margin-bottom: .5rem; }
-    .fotograf-alani p { color: #6b7280; font-size: .9rem; }
+    .fotograf-alani p { color: var(--renk-yazi-ikincil); font-size: .9rem; }
     .fotograf-alani span { color: var(--renk-birincil); font-weight: 600; }
 
     .fotograf-onizlemeler {
@@ -101,60 +111,33 @@
       gap: .75rem;
       margin-top: 1rem;
     }
-    .fotograf-onizleme {
-      position: relative;
-      aspect-ratio: 1;
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    .fotograf-onizleme img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-    }
+    .fotograf-onizleme { position: relative; aspect-ratio: 1; border-radius: 8px; overflow: hidden; }
+    .fotograf-onizleme img { width: 100%; height: 100%; object-fit: cover; }
     .fotograf-sil-btn {
-      position: absolute;
-      top: 4px; right: 4px;
-      background: rgba(0,0,0,.6);
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 24px; height: 24px;
-      font-size: .75rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: absolute; top: 4px; right: 4px;
+      background: rgba(0,0,0,.6); color: #fff; border: none;
+      border-radius: 50%; width: 24px; height: 24px;
+      font-size: .75rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
     }
 
-    /* Fiyat alanı */
-    .fiyat-grup {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: .75rem;
-      align-items: end;
-    }
+    .fiyat-grup { display: grid; grid-template-columns: 1fr auto; gap: .75rem; align-items: end; }
+    .konum-grup { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
 
-    /* Konum */
-    .konum-grup {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .75rem;
-    }
-
-    /* Gönder butonu */
     .gonder-alani {
       position: sticky;
       bottom: 0;
-      background: #fff;
-      border-top: 1px solid #e5e7eb;
+      background: var(--renk-kart);
+      border-top: 1px solid var(--renk-kenar);
       padding: 1rem 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 1rem;
       z-index: 50;
+      transition: background .3s;
     }
-    .gonder-alani p { font-size: .875rem; color: #6b7280; }
+    .gonder-alani p { font-size: .875rem; color: var(--renk-yazi-ikincil); }
 
     @media (max-width: 600px) {
       .kategori-secici { grid-template-columns: repeat(3, 1fr); }
@@ -166,7 +149,6 @@
 </head>
 <body>
 
-  <!-- NAVBAR -->
   <nav class="navbar">
     <div class="navbar-ic">
       <a href="/ilan-platformu/index.html" class="navbar-logo">🏠 İlan Platformu</a>
@@ -176,16 +158,12 @@
     </div>
   </nav>
 
-  <!-- BAŞLIK -->
   <div class="sayfa-baslik">
     <h1>📋 Yeni İlan Ver</h1>
     <p>Hizmetini veya ürününü binlerce kişiye duyur.</p>
   </div>
 
-  <!-- FORM -->
   <div class="form-konteyner">
-
-    <!-- Kategori -->
     <div class="form-bolum">
       <div class="form-bolum-baslik">🏷️ Kategori Seç</div>
       <div class="kategori-secici" id="kategori-secici">
@@ -194,22 +172,20 @@
       <input type="hidden" id="secili-kategori-id" />
     </div>
 
-    <!-- Temel bilgiler -->
     <div class="form-bolum">
       <div class="form-bolum-baslik">📝 İlan Bilgileri</div>
       <div class="form-grup">
         <label for="baslik">Başlık <span style="color:#ef4444">*</span></label>
         <input type="text" id="baslik" placeholder="örn. Matematik özel ders veriyorum" maxlength="100" />
-        <span style="font-size:.75rem;color:#9ca3af" id="baslik-sayac">0/100</span>
+        <span style="font-size:.75rem;color:var(--renk-yazi-uc)" id="baslik-sayac">0/100</span>
       </div>
       <div class="form-grup">
         <label for="aciklama">Açıklama <span style="color:#ef4444">*</span></label>
         <textarea id="aciklama" rows="5"
-          placeholder="Kendin ve sunduğun hizmet hakkında detaylı bilgi ver. Deneyim, uygunluk, fiyatlandırma gibi bilgileri paylaşabilirsin."></textarea>
+          placeholder="Kendin ve sunduğun hizmet hakkında detaylı bilgi ver."></textarea>
       </div>
     </div>
 
-    <!-- Fiyat -->
     <div class="form-bolum">
       <div class="form-bolum-baslik">💰 Fiyat</div>
       <div class="fiyat-grup">
@@ -230,7 +206,6 @@
       </div>
     </div>
 
-    <!-- Konum -->
     <div class="form-bolum">
       <div class="form-bolum-baslik">📍 Konum</div>
       <div class="konum-grup">
@@ -245,7 +220,6 @@
       </div>
     </div>
 
-    <!-- Fotoğraflar -->
     <div class="form-bolum">
       <div class="form-bolum-baslik">📷 Fotoğraflar (isteğe bağlı)</div>
       <div class="fotograf-alani" id="fotograf-alani">
@@ -256,25 +230,23 @@
       </div>
       <div class="fotograf-onizlemeler" id="fotograf-onizlemeler"></div>
     </div>
-
   </div>
 
-  <!-- GÖNDER -->
   <div class="gonder-alani">
     <p>* zorunlu alanlar</p>
-    <button id="gonder-btn" class="btn-birincil" style="padding:.75rem 2rem">
-      İlanı Yayınla
-    </button>
+    <button id="gonder-btn" class="btn-birincil" style="padding:.75rem 2rem">İlanı Yayınla</button>
   </div>
 
   <script type="module">
     import { kategorileriGetir, ilanOlustur } from '/ilan-platformu/js/ilanlar.js';
-    import { ilanDogrula, istemciRateLimit } from '/ilan-platformu/js/validation.js';
+    import { ilanDogrula, istemciRateLimit }  from '/ilan-platformu/js/validation.js';
     import { mevcutKullanici }                from '/ilan-platformu/js/auth.js';
     import { toastBasari, toastHata, btnYukleniyor } from '/ilan-platformu/js/ui.js';
     import { supabase }                       from '/ilan-platformu/js/config.js';
+    import { temaBaslat }                     from '/ilan-platformu/js/tema.js';
 
-    // Giriş kontrolü — sayfa içeriğini gizle, oturum yoksa yönlendir
+    temaBaslat();
+
     document.body.style.visibility = 'hidden';
     const kullanici = await mevcutKullanici();
     if (!kullanici) {
@@ -283,10 +255,8 @@
     }
     document.body.style.visibility = 'visible';
 
-    // Seçili fotoğraflar
     let fotograflar = [];
 
-    // ── Kategorileri yükle ──────────────────────────────────
     const kategoriler = await kategorileriGetir();
     const secici = document.getElementById('kategori-secici');
     secici.innerHTML = '';
@@ -304,24 +274,18 @@
       secici.appendChild(btn);
     });
 
-    // ── Başlık sayacı ───────────────────────────────────────
     document.getElementById('baslik').addEventListener('input', function() {
       document.getElementById('baslik-sayac').textContent = `${this.value.length}/100`;
     });
 
-    // ── Fotoğraf yükleme ────────────────────────────────────
-    const fotografAlani  = document.getElementById('fotograf-alani');
-    const fotografInput  = document.getElementById('fotograf-input');
-    const onizlemeler    = document.getElementById('fotograf-onizlemeler');
+    const fotografAlani = document.getElementById('fotograf-alani');
+    const fotografInput = document.getElementById('fotograf-input');
+    const onizlemeler   = document.getElementById('fotograf-onizlemeler');
 
     fotografAlani.addEventListener('click', () => fotografInput.click());
     fotografAlani.addEventListener('dragover', e => { e.preventDefault(); fotografAlani.style.borderColor = '#0ea5e9'; });
-    fotografAlani.addEventListener('dragleave', () => { fotografAlani.style.borderColor = '#d1d5db'; });
-    fotografAlani.addEventListener('drop', e => {
-      e.preventDefault();
-      fotografAlani.style.borderColor = '#d1d5db';
-      dosyalariEkle([...e.dataTransfer.files]);
-    });
+    fotografAlani.addEventListener('dragleave', () => { fotografAlani.style.borderColor = ''; });
+    fotografAlani.addEventListener('drop', e => { e.preventDefault(); fotografAlani.style.borderColor = ''; dosyalariEkle([...e.dataTransfer.files]); });
     fotografInput.addEventListener('change', () => dosyalariEkle([...fotografInput.files]));
 
     function dosyalariEkle(dosyalar) {
@@ -334,15 +298,11 @@
         reader.onload = e => {
           const div = document.createElement('div');
           div.className = 'fotograf-onizleme';
-          div.innerHTML = `
-            <img src="${e.target.result}" alt="önizleme" />
-            <button class="fotograf-sil-btn" data-index="${fotograflar.length - 1}">✕</button>
-          `;
+          div.innerHTML = `<img src="${e.target.result}" alt="önizleme" /><button class="fotograf-sil-btn" data-index="${fotograflar.length - 1}">✕</button>`;
           div.querySelector('.fotograf-sil-btn').addEventListener('click', (ev) => {
             const idx = parseInt(ev.target.dataset.index);
             fotograflar.splice(idx, 1);
             div.remove();
-            // index'leri güncelle
             onizlemeler.querySelectorAll('.fotograf-sil-btn').forEach((b, i) => b.dataset.index = i);
           });
           onizlemeler.appendChild(div);
@@ -351,30 +311,23 @@
       });
     }
 
-    // ── Fotoğrafları Supabase Storage'a yükle ───────────────
     async function fotograflariYukle(ilanId) {
       const urller = [];
       for (let i = 0; i < fotograflar.length; i++) {
         const dosya  = fotograflar[i];
         const uzanti = dosya.name.split('.').pop();
         const yol    = `${kullanici.id}/${ilanId}/${i}.${uzanti}`;
-        const { error } = await supabase.storage
-          .from('ilan-fotograflari')
-          .upload(yol, dosya, { upsert: true });
+        const { error } = await supabase.storage.from('ilan-fotograflari').upload(yol, dosya, { upsert: true });
         if (error) throw error;
         const { data } = supabase.storage.from('ilan-fotograflari').getPublicUrl(yol);
         urller.push({ url: data.publicUrl, sira: i });
       }
-      // Fotoğraf URL'lerini veritabanına kaydet
       if (urller.length > 0) {
-        const { error } = await supabase.from('ilan_fotograflari').insert(
-          urller.map(u => ({ ilan_id: ilanId, url: u.url, sira: u.sira }))
-        );
+        const { error } = await supabase.from('ilan_fotograflari').insert(urller.map(u => ({ ilan_id: ilanId, url: u.url, sira: u.sira })));
         if (error) throw error;
       }
     }
 
-    // ── İlanı gönder ────────────────────────────────────────
     const gonderBtn = document.getElementById('gonder-btn');
     gonderBtn.addEventListener('click', async () => {
       const kategoriId  = document.getElementById('secili-kategori-id').value;
@@ -385,20 +338,19 @@
       const sehir       = document.getElementById('sehir').value.trim();
       const ilce        = document.getElementById('ilce').value.trim();
 
-      // Rate limit kontrolü
       const limit = istemciRateLimit('ilan-olustur', 5);
       if (!limit.izinli) return toastHata(`Lütfen ${limit.kalanSaniye} saniye bekleyin.`);
 
-      // Doğrulama
       const { gecerli, hatalar, temizVeri } = ilanDogrula({ kategoriId, baslik, aciklama, fiyat, sehir, ilce });
       if (!gecerli) return toastHata(hatalar[0]);
 
       try {
         btnYukleniyor(gonderBtn, true, 'İlanı Yayınla');
-        const ilan = await ilanOlustur({ ...temizVeri, fiyatBirimi });
+        const iletisimTercihi = document.querySelector('input[name="iletisim-tercihi"]:checked')?.value ?? 'mesajlasma';
+        const ilan = await ilanOlustur({ ...temizVeri, fiyatBirimi, iletisimTercihi });
         if (fotograflar.length > 0) await fotograflariYukle(ilan.id);
         toastBasari('İlanın yayınlandı! 🎉');
-        setTimeout(() => { window.location.href = `ilan-detay.html?id=${ilan.id}`; }, 1200);
+        setTimeout(() => { window.location.href = `/ilan-platformu/ilan-detay.html?id=${ilan.id}`; }, 1200);
       } catch (e) {
         console.error(e);
         toastHata('Bir hata oluştu: ' + e.message);
