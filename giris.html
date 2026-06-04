@@ -7,6 +7,14 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Giriş Yap — İlan Platformu</title>
+  <script>
+    // Tema titreşimini önle — CSS yüklenmeden önce çalışır
+    (function() {
+      const t = localStorage.getItem('tema-tercihi') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-tema', t);
+    })();
+  </script>
   <link rel="stylesheet" href="/ilan-platformu/css/main.css" />
 </head>
 <body class="auth-sayfa">
@@ -82,6 +90,8 @@
 
   <script type="module">
     import { girisYap, kayitOl, sifreSifirla, sifreGuncelle, mevcutKullanici } from '/ilan-platformu/js/auth.js';
+    import { temaBaslat } from '/ilan-platformu/js/tema.js';
+    temaBaslat();
     import { supabase } from '/ilan-platformu/js/config.js';
     import { kayitDogrula, epostaGecerliMi, istemciRateLimit } from '/ilan-platformu/js/validation.js';
 
