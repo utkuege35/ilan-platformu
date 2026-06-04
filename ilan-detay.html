@@ -2,6 +2,13 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    (function() {
+      const t = localStorage.getItem('tema-tercihi') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-tema', t);
+    })();
+  </script>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -18,208 +25,102 @@
       gap: 1.75rem;
       align-items: start;
     }
-
-    /* ── Sol kolon ─────────────────────────────────────────── */
     .detay-sol { min-width: 0; }
-
-    /* Fotoğraf galerisi */
     .galeri {
       border-radius: 16px;
       overflow: hidden;
-      background: #f3f4f6;
+      background: var(--renk-kenar-ac);
       margin-bottom: 1.5rem;
-      position: relative;
     }
-    .galeri-ana {
-      aspect-ratio: 16/9;
-      overflow: hidden;
-    }
-    .galeri-ana img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      cursor: zoom-in;
-    }
+    .galeri-ana { aspect-ratio: 16/9; overflow: hidden; }
+    .galeri-ana img { width: 100%; height: 100%; object-fit: cover; cursor: zoom-in; }
     .galeri-ana-yok {
-      width: 100%; height: 100%;
-      min-height: 240px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 5rem;
-      background: #e0f2fe;
+      width: 100%; height: 100%; min-height: 240px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 5rem; background: var(--renk-birincil-ac);
     }
-    .galeri-kucukler {
-      display: flex;
-      gap: .5rem;
-      padding: .5rem;
-      overflow-x: auto;
-    }
+    .galeri-kucukler { display: flex; gap: .5rem; padding: .5rem; overflow-x: auto; }
     .galeri-kucukler img {
-      width: 72px; height: 54px;
-      object-fit: cover;
-      border-radius: 6px;
-      cursor: pointer;
-      border: 2px solid transparent;
-      transition: border-color .2s;
-      flex-shrink: 0;
+      width: 72px; height: 54px; object-fit: cover; border-radius: 6px;
+      cursor: pointer; border: 2px solid transparent; transition: border-color .2s; flex-shrink: 0;
     }
     .galeri-kucukler img.aktif { border-color: var(--renk-birincil); }
-
-    /* İlan bilgileri */
-    .ilan-baslik-alani {
-      margin-bottom: 1.25rem;
-    }
+    .ilan-baslik-alani { margin-bottom: 1.25rem; }
     .ilan-kategori-etiket {
-      display: inline-flex;
-      align-items: center;
-      gap: .35rem;
-      background: #e0f2fe;
-      color: #0284c7;
-      padding: .3rem .75rem;
-      border-radius: 99px;
-      font-size: .8rem;
-      font-weight: 600;
-      margin-bottom: .75rem;
+      display: inline-flex; align-items: center; gap: .35rem;
+      background: var(--renk-birincil-ac); color: var(--renk-birincil);
+      padding: .3rem .75rem; border-radius: 99px; font-size: .8rem; font-weight: 600; margin-bottom: .75rem;
     }
-    .ilan-baslik {
-      font-size: 1.75rem;
-      font-weight: 800;
-      color: #1f2937;
-      line-height: 1.3;
-      margin-bottom: .75rem;
-    }
+    .ilan-baslik { font-size: 1.75rem; font-weight: 800; color: var(--renk-yazi); line-height: 1.3; margin-bottom: .75rem; }
     .ilan-meta-satir {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-      flex-wrap: wrap;
-      font-size: .875rem;
-      color: #6b7280;
+      display: flex; align-items: center; gap: 1.25rem;
+      flex-wrap: wrap; font-size: .875rem; color: var(--renk-yazi-ikincil);
     }
-    .ilan-meta-satir span {
-      display: flex;
-      align-items: center;
-      gap: .3rem;
-    }
-
-    /* Açıklama */
+    .ilan-meta-satir span { display: flex; align-items: center; gap: .3rem; }
     .aciklama-kutu {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 1.5rem;
-      margin-bottom: 1.25rem;
+      background: var(--renk-kart); border: 1px solid var(--renk-kenar);
+      border-radius: 16px; padding: 1.5rem; margin-bottom: 1.25rem; transition: background .3s;
     }
-    .aciklama-kutu h3 {
-      font-size: 1rem;
-      font-weight: 700;
-      margin-bottom: .875rem;
-      color: #1f2937;
-    }
-    .aciklama-metin {
-      color: #374151;
-      line-height: 1.75;
-      white-space: pre-wrap;
-      font-size: .95rem;
-    }
-
-    /* ── Sağ kolon ─────────────────────────────────────────── */
+    .aciklama-kutu h3 { font-size: 1rem; font-weight: 700; margin-bottom: .875rem; color: var(--renk-yazi); }
+    .aciklama-metin { color: var(--renk-yazi); line-height: 1.75; white-space: pre-wrap; font-size: .95rem; }
     .detay-sag { position: sticky; top: 80px; }
-
     .fiyat-kutu {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 1.5rem;
-      margin-bottom: 1.25rem;
+      background: var(--renk-kart); border: 1px solid var(--renk-kenar);
+      border-radius: 16px; padding: 1.5rem; margin-bottom: 1.25rem; transition: background .3s;
     }
-    .fiyat-buyuk {
-      font-size: 2rem;
-      font-weight: 800;
-      color: var(--renk-birincil);
-      margin-bottom: 1rem;
-    }
-    .fiyat-buyuk span {
-      font-size: 1rem;
-      font-weight: 500;
-      color: #6b7280;
-    }
-
-    /* Mesaj formu */
+    .fiyat-buyuk { font-size: 2rem; font-weight: 800; color: var(--renk-birincil); margin-bottom: 1rem; }
     .mesaj-formu textarea {
-      width: 100%;
-      padding: .75rem;
-      border: 1.5px solid #e5e7eb;
-      border-radius: 10px;
-      font-size: .9rem;
-      resize: none;
-      outline: none;
-      font-family: inherit;
-      transition: border-color .2s;
-      margin-bottom: .75rem;
+      width: 100%; padding: .75rem; border: 1.5px solid var(--renk-kenar);
+      border-radius: 10px; font-size: .9rem; resize: none; outline: none;
+      font-family: inherit; transition: border-color .2s; margin-bottom: .75rem;
+      background: var(--input-bg); color: var(--renk-yazi);
     }
     .mesaj-formu textarea:focus { border-color: var(--renk-birincil); }
-
-    /* Satıcı kartı */
-    .satici-kutu {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 1.5rem;
-    }
-    .satici-kutu h3 {
-      font-size: .875rem;
-      font-weight: 700;
-      color: #6b7280;
-      text-transform: uppercase;
-      letter-spacing: .05em;
-      margin-bottom: 1rem;
-    }
-    .satici-profil {
-      display: flex;
-      align-items: center;
-      gap: .875rem;
-      margin-bottom: 1rem;
-    }
-    .satici-avatar {
-      width: 52px; height: 52px;
-      border-radius: 50%;
-      background: #e0f2fe;
-      color: var(--renk-birincil);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.25rem;
-      font-weight: 700;
-      flex-shrink: 0;
-      overflow: hidden;
-    }
-    .satici-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .satici-ad { font-size: 1rem; font-weight: 700; color: #1f2937; }
-    .satici-sehir { font-size: .825rem; color: #6b7280; }
-    .satici-iletisim {
-      display: flex;
-      flex-direction: column;
-      gap: .5rem;
-      margin-top: .75rem;
-      padding-top: .75rem;
-      border-top: 1px solid #f3f4f6;
-    }
-    .satici-iletisim a {
-      display: flex;
-      align-items: center;
-      gap: .5rem;
-      font-size: .875rem;
-      color: #374151;
-      text-decoration: none;
-      padding: .5rem .75rem;
-      border-radius: 8px;
-      background: #f9fafb;
+    /* WhatsApp butonu */
+    .btn-whatsapp {
+      display: flex; align-items: center; justify-content: center; gap: .5rem;
+      width: 100%; padding: .65rem 1.5rem; margin-bottom: .75rem;
+      background: #25d366; color: #fff; border: none; border-radius: var(--yaricap);
+      font-size: .95rem; font-weight: 600; cursor: pointer; text-decoration: none;
       transition: background .2s;
     }
-    .satici-iletisim a:hover { background: #e0f2fe; }
-
-    /* Şikayet modalı */
+    .btn-whatsapp:hover { background: #1da851; text-decoration: none; }
+    .iletisim-ayrac {
+      text-align: center; font-size: .8rem; color: var(--renk-yazi-uc);
+      margin: .75rem 0; display: flex; align-items: center; gap: .5rem;
+    }
+    .iletisim-ayrac::before, .iletisim-ayrac::after {
+      content: ''; flex: 1; height: 1px; background: var(--renk-kenar);
+    }
+    .satici-kutu {
+      background: var(--renk-kart); border: 1px solid var(--renk-kenar);
+      border-radius: 16px; padding: 1.5rem; transition: background .3s;
+    }
+    .satici-kutu h3 {
+      font-size: .875rem; font-weight: 700; color: var(--renk-yazi-ikincil);
+      text-transform: uppercase; letter-spacing: .05em; margin-bottom: 1rem;
+    }
+    .satici-profil { display: flex; align-items: center; gap: .875rem; margin-bottom: 1rem; }
+    .satici-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--renk-birincil-ac); color: var(--renk-birincil);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; font-weight: 700; flex-shrink: 0; overflow: hidden;
+    }
+    .satici-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .satici-ad { font-size: 1rem; font-weight: 700; color: var(--renk-yazi); }
+    .satici-sehir { font-size: .825rem; color: var(--renk-yazi-ikincil); }
+    .satici-iletisim {
+      display: flex; flex-direction: column; gap: .5rem;
+      margin-top: .75rem; padding-top: .75rem; border-top: 1px solid var(--renk-kenar);
+    }
+    .satici-iletisim a {
+      display: flex; align-items: center; gap: .5rem; font-size: .875rem;
+      color: var(--renk-yazi); text-decoration: none; padding: .5rem .75rem;
+      border-radius: 8px; background: var(--renk-kenar-ac); transition: background .2s;
+    }
+    .satici-iletisim a:hover { background: var(--renk-birincil-ac); }
+    /* Şikayet modal */
     .sikayet-modal-arkaplan {
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,.5); z-index: 500;
@@ -227,51 +128,41 @@
     }
     .sikayet-modal-arkaplan.aktif { display: flex; }
     .sikayet-modal {
-      background: #fff; border-radius: 20px; padding: 2rem;
+      background: var(--renk-kart); border-radius: 20px; padding: 2rem;
       width: 100%; max-width: 420px; margin: 1rem;
-      box-shadow: 0 20px 60px rgba(0,0,0,.2);
+      box-shadow: 0 20px 60px rgba(0,0,0,.3);
     }
-    .sikayet-modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: #1f2937; }
+    .sikayet-modal h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 1.25rem; color: var(--renk-yazi); }
     .sikayet-secenekler { display: flex; flex-direction: column; gap: .5rem; margin-bottom: 1rem; }
     .sikayet-secenek {
       display: flex; align-items: center; gap: .75rem;
-      padding: .75rem 1rem; border: 1.5px solid #e5e7eb; border-radius: 10px;
+      padding: .75rem 1rem; border: 1.5px solid var(--renk-kenar); border-radius: 10px;
       cursor: pointer; transition: border-color .2s, background .2s;
-      font-size: .9rem; color: #374151; background: none; text-align: left;
+      font-size: .9rem; color: var(--renk-yazi); background: none; text-align: left;
     }
-    .sikayet-secenek:hover { border-color: #0ea5e9; background: #f0f9ff; }
-    .sikayet-secenek.secili { border-color: #0ea5e9; background: #e0f2fe; color: #0284c7; font-weight: 600; }
+    .sikayet-secenek:hover { border-color: var(--renk-birincil); background: var(--renk-birincil-ac); }
+    .sikayet-secenek.secili { border-color: var(--renk-birincil); background: var(--renk-birincil-ac); color: var(--renk-birincil); font-weight: 600; }
     .sikayet-aciklama {
-      width: 100%; padding: .65rem .875rem; border: 1.5px solid #e5e7eb;
+      width: 100%; padding: .65rem .875rem; border: 1.5px solid var(--renk-kenar);
       border-radius: 10px; font-size: .875rem; font-family: inherit;
-      resize: none; outline: none; margin-bottom: 1rem; transition: border-color .2s;
+      resize: none; outline: none; margin-bottom: 1rem;
+      background: var(--input-bg); color: var(--renk-yazi);
     }
-    .sikayet-aciklama:focus { border-color: #0ea5e9; }
+    .sikayet-aciklama:focus { border-color: var(--renk-birincil); }
     .sikayet-modal-butonlar { display: flex; gap: .75rem; justify-content: flex-end; }
     .sikayet-btn { padding: .5rem 1rem; border-radius: 8px; font-size: .875rem; font-weight: 600; cursor: pointer; border: none; }
-    .sikayet-iptal { background: #f3f4f6; color: #374151; }
+    .sikayet-iptal { background: var(--renk-kenar-ac); color: var(--renk-yazi); }
     .sikayet-gonder { background: #ef4444; color: #fff; }
     .sikayet-gonder:disabled { opacity: .6; cursor: not-allowed; }
-
-    /* Yükleniyor / hata */
     .yukleniyor-alani { padding: 4rem 0; }
-
-    /* Mobil */
     @media (max-width: 768px) {
-      .detay-konteyner {
-        grid-template-columns: 1fr;
-        margin: 1rem auto;
-        padding: 0 1rem 4rem;
-        gap: 1rem;
-      }
+      .detay-konteyner { grid-template-columns: 1fr; margin: 1rem auto; padding: 0 1rem 4rem; gap: 1rem; }
       .detay-sag { position: static; }
       .ilan-baslik { font-size: 1.35rem; }
     }
   </style>
 </head>
 <body>
-
-  <!-- NAVBAR -->
   <nav class="navbar">
     <div class="navbar-ic">
       <a href="/ilan-platformu/index.html" class="navbar-logo">🏠 İlan Platformu</a>
@@ -286,21 +177,16 @@
     </div>
   </nav>
 
-  <!-- İÇERİK -->
   <div id="ilan-yukleniyor" class="konteyner yukleniyor-alani">
     <div class="yukleniyor-spinner"></div>
   </div>
 
   <div id="ilan-icerik" class="detay-konteyner" style="display:none">
-
-    <!-- SOL: Fotoğraf + Bilgiler -->
     <div class="detay-sol">
-
       <div class="galeri" id="galeri">
         <div class="galeri-ana" id="galeri-ana"></div>
         <div class="galeri-kucukler" id="galeri-kucukler" style="display:none"></div>
       </div>
-
       <div class="ilan-baslik-alani">
         <div class="ilan-kategori-etiket" id="kategori-etiket"></div>
         <h1 class="ilan-baslik" id="ilan-baslik"></h1>
@@ -310,39 +196,24 @@
           <span>🕐 <span id="ilan-tarih"></span></span>
         </div>
       </div>
-
       <div class="aciklama-kutu">
         <h3>📋 Açıklama</h3>
         <div class="aciklama-metin" id="ilan-aciklama"></div>
       </div>
-
     </div>
 
-    <!-- SAĞ: Fiyat + Mesaj + Satıcı -->
     <div class="detay-sag">
-
-      <!-- Fiyat & Mesaj -->
       <div class="fiyat-kutu">
         <div class="fiyat-buyuk" id="ilan-fiyat"></div>
-
-        <!-- Kendi ilanıysa düzenle butonu -->
         <div id="kendi-ilan-alani" style="display:none">
           <a id="duzenle-btn" href="#" class="btn-ikincil tam" style="margin-bottom:.75rem;display:flex;justify-content:center">✏️ İlanı Düzenle</a>
           <button id="pasif-btn" class="btn-link tam" style="text-align:center;color:#ef4444">İlanı Pasife Al</button>
         </div>
-
-        <!-- Başkasının ilanıysa mesaj formu -->
-        <div id="mesaj-alani" class="mesaj-formu">
-          <textarea id="mesaj-icerik" rows="4"
-            placeholder="Merhaba, ilanınızla ilgili bilgi almak istiyorum..."></textarea>
-          <button id="mesaj-gonder-btn" class="btn-birincil tam">💬 Mesaj Gönder</button>
-          <p style="font-size:.75rem;color:#9ca3af;text-align:center;margin-top:.5rem">
-            Mesaj göndermek için giriş yapmanız gerekir.
-          </p>
+        <div id="iletisim-alani">
+          <!-- JS ile doldurulacak: whatsapp ve/veya mesaj formu -->
         </div>
       </div>
 
-      <!-- Satıcı Kartı -->
       <div class="satici-kutu">
         <h3>İlan Sahibi</h3>
         <div class="satici-profil">
@@ -356,11 +227,10 @@
       </div>
 
       <div id="sikayet-alan" style="display:none;text-align:center;margin-top:.75rem">
-        <button id="sikayet-btn" class="btn-link" style="color:#9ca3af;font-size:.8rem">
+        <button id="sikayet-btn" class="btn-link" style="color:var(--renk-yazi-uc);font-size:.8rem">
           🚩 Bu ilanı şikayet et
         </button>
       </div>
-
     </div>
   </div>
 
@@ -392,14 +262,16 @@
   </div>
 
   <script type="module">
-    import { ilanGetir }                              from '/ilan-platformu/js/ilanlar.js';
-    import { mevcutKullanici, navbarGuncelle, cikisYap } from '/ilan-platformu/js/auth.js';
+    import { ilanGetir }                                         from '/ilan-platformu/js/ilanlar.js';
+    import { mevcutKullanici, navbarGuncelle }                   from '/ilan-platformu/js/auth.js';
     import { fiyatFormatla, tarihFormatla, toastBasari, toastHata, toastBilgi } from '/ilan-platformu/js/ui.js';
-    import { supabase }                               from '/ilan-platformu/js/config.js';
+    import { supabase }                                          from '/ilan-platformu/js/config.js';
+    import { temaBaslat }                                        from '/ilan-platformu/js/tema.js';
 
-    const params  = new URLSearchParams(window.location.search);
-    const ilanId  = params.get('id');
+    temaBaslat();
 
+    const params = new URLSearchParams(window.location.search);
+    const ilanId = params.get('id');
     navbarGuncelle();
 
     if (!ilanId) {
@@ -411,10 +283,7 @@
 
     async function yukle() {
       try {
-        const [ilan, kullanici] = await Promise.all([
-          ilanGetir(ilanId),
-          mevcutKullanici()
-        ]);
+        const [ilan, kullanici] = await Promise.all([ilanGetir(ilanId), mevcutKullanici()]);
 
         document.title = `${ilan.baslik} — İlan Platformu`;
         document.getElementById('ilan-yukleniyor').style.display = 'none';
@@ -424,15 +293,13 @@
         const fotograflar = ilan.ilan_fotograflari ?? [];
         const galeriAna   = document.getElementById('galeri-ana');
         const galeriKucuk = document.getElementById('galeri-kucukler');
-
         if (fotograflar.length > 0) {
           galeriAna.innerHTML = `<img id="ana-foto" src="${fotograflar[0].url}" alt="${ilan.baslik}" />`;
           if (fotograflar.length > 1) {
             galeriKucuk.style.display = 'flex';
             fotograflar.forEach((f, i) => {
               const img = document.createElement('img');
-              img.src = f.url;
-              img.alt = `Fotoğraf ${i+1}`;
+              img.src = f.url; img.alt = `Fotoğraf ${i+1}`;
               if (i === 0) img.classList.add('aktif');
               img.addEventListener('click', () => {
                 document.getElementById('ana-foto').src = f.url;
@@ -446,19 +313,17 @@
           galeriAna.innerHTML = `<div class="galeri-ana-yok">${ilan.kategoriler?.ikon ?? '📋'}</div>`;
         }
 
-        // Başlık ve meta
-        document.getElementById('kategori-etiket').innerHTML =
-          `${ilan.kategoriler?.ikon ?? ''} ${ilan.kategoriler?.ad ?? ''}`;
-        document.getElementById('ilan-baslik').textContent     = ilan.baslik;
-        document.getElementById('ilan-konum').textContent      = ilan.ilce ? `${ilan.ilce}, ${ilan.sehir}` : ilan.sehir;
+        // Meta
+        document.getElementById('kategori-etiket').innerHTML = `${ilan.kategoriler?.ikon ?? ''} ${ilan.kategoriler?.ad ?? ''}`;
+        document.getElementById('ilan-baslik').textContent = ilan.baslik;
+        document.getElementById('ilan-konum').textContent  = ilan.ilce ? `${ilan.ilce}, ${ilan.sehir}` : ilan.sehir;
         document.getElementById('ilan-goruntuleme').textContent = ilan.goruntuleme;
-        document.getElementById('ilan-tarih').textContent      = tarihFormatla(ilan.created_at);
-        document.getElementById('ilan-aciklama').textContent   = ilan.aciklama;
-        document.getElementById('ilan-fiyat').innerHTML =
-          `${fiyatFormatla(ilan.fiyat, ilan.fiyat_birimi)}`;
+        document.getElementById('ilan-tarih').textContent  = tarihFormatla(ilan.created_at);
+        document.getElementById('ilan-aciklama').textContent = ilan.aciklama;
+        document.getElementById('ilan-fiyat').textContent  = fiyatFormatla(ilan.fiyat, ilan.fiyat_birimi);
 
         // Satıcı
-        const profil = ilan.profiles;
+        const profil   = ilan.profiles;
         const avatarEl = document.getElementById('satici-avatar');
         if (profil.avatar_url) {
           avatarEl.innerHTML = `<img src="${profil.avatar_url}" alt="${profil.ad_soyad}" />`;
@@ -468,63 +333,97 @@
         document.getElementById('satici-ad').textContent    = profil.ad_soyad;
         document.getElementById('satici-sehir').textContent = profil.sehir ?? '';
 
-        // İletişim bilgisi (sadece giriş yapılmışsa göster)
-        const iletisimEl = document.getElementById('satici-iletisim');
-        if (kullanici && profil.telefon) {
-          iletisimEl.innerHTML = `
-            <a href="tel:${profil.telefon}">📞 ${profil.telefon}</a>
-          `;
-        } else if (!kullanici) {
-          iletisimEl.innerHTML = `
-            <p style="font-size:.8rem;color:#9ca3af;text-align:center">
-              İletişim bilgisini görmek için <a href="/ilan-platformu/giris.html">giriş yapın</a>.
-            </p>`;
-        }
-
-        // Şikayet sistemini kur (kendi ilanı değilse)
-        if (kullanici && kullanici.id !== ilan.user_id) {
-          sikayetModalKur(kullanici, ilanId);
-        }
-
         // Kendi ilanı mı?
         if (kullanici && kullanici.id === ilan.user_id) {
           document.getElementById('kendi-ilan-alani').style.display = 'block';
-          document.getElementById('mesaj-alani').style.display      = 'none';
-          document.getElementById('duzenle-btn').href = `ilan-ver.html?duzenle=${ilan.id}`;
+          document.getElementById('iletisim-alani').style.display = 'none';
+          document.getElementById('duzenle-btn').href = `/ilan-platformu/ilan-ver.html?duzenle=${ilan.id}`;
           document.getElementById('pasif-btn').addEventListener('click', async () => {
             if (!confirm('İlanı pasife almak istediğine emin misin?')) return;
             try {
-              const { ilanPasifYap } = await import('./js/ilanlar.js');
-              await ilanPasifYap(ilanId);
+              await supabase.from('ilanlar').update({ durum: 'pasif' }).eq('id', ilanId);
               toastBasari('İlan pasife alındı.');
               setTimeout(() => window.location.href = '/ilan-platformu/index.html', 1200);
             } catch(e) { toastHata(e.message); }
           });
+          return;
         }
 
-        // Mesaj gönder
-        document.getElementById('mesaj-gonder-btn').addEventListener('click', async () => {
-          if (!kullanici) {
-            toastBilgi('Mesaj göndermek için giriş yapmalısınız.');
-            setTimeout(() => window.location.href = `giris.html?sonra=ilan-detay.html?id=${ilanId}`, 1000);
-            return;
-          }
-          const icerik = document.getElementById('mesaj-icerik').value.trim();
-          if (!icerik) { toastHata('Mesaj boş olamaz.'); return; }
+        // ── İletişim butonlarını iletisim_tercihi'ne göre göster ──
+        const tercih = ilan.iletisim_tercihi ?? 'mesajlasma';
+        const iletisimAlani = document.getElementById('iletisim-alani');
+        const telefon = profil.telefon;
 
-          const btn = document.getElementById('mesaj-gonder-btn');
-          btn.disabled = true; btn.textContent = 'Gönderiliyor...';
-          try {
-            await mesajGonder(kullanici.id, ilan.user_id, ilanId, icerik);
-            toastBasari('Mesajın gönderildi! 🎉');
-            document.getElementById('mesaj-icerik').value = '';
-            setTimeout(() => window.location.href = '/ilan-platformu/mesajlar.html', 1200);
-          } catch(e) {
-            toastHata('Mesaj gönderilemedi: ' + e.message);
-          } finally {
-            btn.disabled = false; btn.textContent = '💬 Mesaj Gönder';
-          }
-        });
+        // WhatsApp butonu
+        if ((tercih === 'whatsapp' || tercih === 'her_ikisi') && telefon) {
+          const temizTel = telefon.replace(/[^0-9]/g, '').replace(/^0/, '90');
+          const waMetin  = encodeURIComponent(`Merhaba, "${ilan.baslik}" ilanınız hakkında bilgi almak istiyorum.`);
+          const waBtn    = document.createElement('a');
+          waBtn.href     = `https://wa.me/${temizTel}?text=${waMetin}`;
+          waBtn.target   = '_blank';
+          waBtn.rel      = 'noopener noreferrer';
+          waBtn.className = 'btn-whatsapp';
+          waBtn.innerHTML = '📱 WhatsApp'tan Yaz';
+          iletisimAlani.appendChild(waBtn);
+        }
+
+        // Ayraç (her_ikisi ise)
+        if (tercih === 'her_ikisi') {
+          const ayrac = document.createElement('div');
+          ayrac.className = 'iletisim-ayrac';
+          ayrac.textContent = 'veya';
+          iletisimAlani.appendChild(ayrac);
+        }
+
+        // Platform içi mesaj formu
+        if (tercih === 'mesajlasma' || tercih === 'her_ikisi') {
+          const formDiv = document.createElement('div');
+          formDiv.className = 'mesaj-formu';
+          formDiv.innerHTML = `
+            <textarea id="mesaj-icerik" rows="4" placeholder="Merhaba, ilanınızla ilgili bilgi almak istiyorum..."></textarea>
+            <button id="mesaj-gonder-btn" class="btn-birincil tam">💬 Mesaj Gönder</button>
+            <p style="font-size:.75rem;color:var(--renk-yazi-uc);text-align:center;margin-top:.5rem">
+              Mesaj göndermek için giriş yapmanız gerekir.
+            </p>
+          `;
+          iletisimAlani.appendChild(formDiv);
+
+          document.getElementById('mesaj-gonder-btn').addEventListener('click', async () => {
+            if (!kullanici) {
+              toastBilgi('Mesaj göndermek için giriş yapmalısınız.');
+              setTimeout(() => window.location.href = `/ilan-platformu/giris.html?sonra=/ilan-platformu/ilan-detay.html?id=${ilanId}`, 1000);
+              return;
+            }
+            const icerik = document.getElementById('mesaj-icerik').value.trim();
+            if (!icerik) { toastHata('Mesaj boş olamaz.'); return; }
+            const btn = document.getElementById('mesaj-gonder-btn');
+            btn.disabled = true; btn.textContent = 'Gönderiliyor...';
+            try {
+              await mesajGonder(kullanici.id, ilan.user_id, ilanId, icerik);
+              toastBasari('Mesajın gönderildi! 🎉');
+              document.getElementById('mesaj-icerik').value = '';
+              setTimeout(() => window.location.href = '/ilan-platformu/mesajlar.html', 1200);
+            } catch(e) {
+              toastHata('Mesaj gönderilemedi: ' + e.message);
+            } finally {
+              btn.disabled = false; btn.textContent = '💬 Mesaj Gönder';
+            }
+          });
+        }
+
+        // Giriş yapılmışsa telefonu göster (eğer whatsapp seçilmemişse)
+        const iletisimEl = document.getElementById('satici-iletisim');
+        if (kullanici && telefon && tercih !== 'whatsapp' && tercih !== 'her_ikisi') {
+          iletisimEl.innerHTML = `<a href="tel:${telefon}">📞 ${telefon}</a>`;
+        } else if (!kullanici) {
+          iletisimEl.innerHTML = `<p style="font-size:.8rem;color:var(--renk-yazi-uc);text-align:center">
+            İletişim bilgisini görmek için <a href="/ilan-platformu/giris.html">giriş yapın</a>.</p>`;
+        }
+
+        // Şikayet
+        if (kullanici && kullanici.id !== ilan.user_id) {
+          sikayetModalKur(kullanici, ilanId);
+        }
 
       } catch(e) {
         console.error(e);
@@ -533,24 +432,15 @@
       }
     }
 
-    // ── Şikayet sistemi ─────────────────────────────────────
     function sikayetModalKur(kullanici, ilanId) {
       const alan = document.getElementById('sikayet-alan');
-      if (!kullanici) return;
       alan.style.display = 'block';
       let seciliSebep = null;
       const modal     = document.getElementById('sikayet-modal-arkaplan');
       const gonderBtn = document.getElementById('sikayet-gonder');
-
-      document.getElementById('sikayet-btn').addEventListener('click', () => {
-        modal.classList.add('aktif');
-      });
-      document.getElementById('sikayet-iptal').addEventListener('click', () => {
-        modal.classList.remove('aktif');
-      });
-      modal.addEventListener('click', (e) => {
-        if (e.target === modal) modal.classList.remove('aktif');
-      });
+      document.getElementById('sikayet-btn').addEventListener('click', () => modal.classList.add('aktif'));
+      document.getElementById('sikayet-iptal').addEventListener('click', () => modal.classList.remove('aktif'));
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.remove('aktif'); });
       document.querySelectorAll('.sikayet-secenek').forEach(btn => {
         btn.addEventListener('click', () => {
           document.querySelectorAll('.sikayet-secenek').forEach(b => b.classList.remove('secili'));
@@ -561,47 +451,33 @@
       });
       gonderBtn.addEventListener('click', async () => {
         if (!seciliSebep) return;
-        gonderBtn.disabled = true;
-        gonderBtn.textContent = 'Gönderiliyor...';
+        gonderBtn.disabled = true; gonderBtn.textContent = 'Gönderiliyor...';
         try {
           const { error } = await supabase.from('sikayetler').insert({
-            ilan_id:  ilanId,
-            user_id:  kullanici.id,
-            sebep:    seciliSebep,
+            ilan_id: ilanId, user_id: kullanici.id, sebep: seciliSebep,
             aciklama: document.getElementById('sikayet-aciklama').value.trim() || null
           });
-          if (error && error.code === '23505') {
-            toastBilgi('Bu ilanı daha önce şikayet ettiniz.');
-          } else if (error) {
-            throw error;
-          } else {
-            toastBasari('Şikayetiniz alındı. Teşekkürler.');
-          }
+          if (error?.code === '23505') toastBilgi('Bu ilanı daha önce şikayet ettiniz.');
+          else if (error) throw error;
+          else toastBasari('Şikayetiniz alındı. Teşekkürler.');
           modal.classList.remove('aktif');
         } catch(e) {
           toastHata('Şikayet gönderilemedi: ' + e.message);
-          gonderBtn.disabled = false;
-          gonderBtn.textContent = 'Şikayet Gönder';
+          gonderBtn.disabled = false; gonderBtn.textContent = 'Şikayet Gönder';
         }
       });
     }
 
-    // ── Mesaj gönderme (konuşma yoksa oluştur) ──────────────
     async function mesajGonder(gondeId, aliciId, ilanId, icerik) {
-      // Konuşmayı bul veya oluştur (upsert)
       const { data: konusma, error: kErr } = await supabase
         .from('konusmalar')
         .upsert(
           { ilan_id: ilanId, ilan_sahibi: aliciId, mesajci: gondeId, son_mesaj: icerik },
           { onConflict: 'ilan_id,mesajci', ignoreDuplicates: false }
         )
-        .select()
-        .single();
+        .select().single();
       if (kErr) throw kErr;
-
-      // Mesajı ekle
-      const { error: mErr } = await supabase
-        .from('mesajlar')
+      const { error: mErr } = await supabase.from('mesajlar')
         .insert({ konusma_id: konusma.id, gonderen_id: gondeId, icerik });
       if (mErr) throw mErr;
     }
