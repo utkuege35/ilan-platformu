@@ -2,6 +2,13 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    (function() {
+      const t = localStorage.getItem('tema-tercihi') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-tema', t);
+    })();
+  </script>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -9,184 +16,67 @@
   <title>Profilim — İlan Platformu</title>
   <link rel="stylesheet" href="/ilan-platformu/css/main.css" />
   <style>
-    .profil-konteyner {
-      max-width: 900px;
-      margin: 2rem auto;
-      padding: 0 1.5rem 4rem;
-    }
-
-    /* ── Profil kartı ─────────────────────────────────────── */
-    .profil-kart {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 20px;
-      overflow: hidden;
-      margin-bottom: 1.5rem;
-    }
-    .profil-banner {
-      height: 100px;
-      background: linear-gradient(135deg, #e0f2fe 0%, #bae6fd 100%);
-    }
-    .profil-icerik {
-      padding: 0 1.75rem 1.75rem;
-      position: relative;
-    }
-    .profil-avatar-alani {
-      display: flex;
-      align-items: flex-end;
-      gap: 1rem;
-      margin-top: -36px;
-      margin-bottom: 1.25rem;
-    }
+    .profil-konteyner { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem 4rem; }
+    .profil-kart { background: var(--renk-kart); border: 1px solid var(--renk-kenar); border-radius: 20px; overflow: hidden; margin-bottom: 1.5rem; transition: background .3s; }
+    .profil-banner { height: 100px; background: linear-gradient(135deg, var(--renk-birincil-ac) 0%, var(--renk-arka) 100%); transition: background .3s; }
+    .profil-icerik { padding: 0 1.75rem 1.75rem; position: relative; }
+    .profil-avatar-alani { display: flex; align-items: flex-end; gap: 1rem; margin-top: -36px; margin-bottom: 1.25rem; }
     .profil-avatar {
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      background: #e0f2fe;
-      color: var(--renk-birincil);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2rem;
-      font-weight: 700;
-      border: 4px solid #fff;
-      box-shadow: 0 2px 8px rgba(0,0,0,.1);
-      overflow: hidden;
-      flex-shrink: 0;
-      cursor: pointer;
-      position: relative;
+      width: 80px; height: 80px; border-radius: 50%;
+      background: var(--renk-birincil-ac); color: var(--renk-birincil);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; font-weight: 700;
+      border: 4px solid var(--renk-kart);
+      box-shadow: 0 2px 8px rgba(0,0,0,.15);
+      overflow: hidden; flex-shrink: 0; cursor: pointer; position: relative;
+      transition: border-color .3s;
     }
     .profil-avatar img { width: 100%; height: 100%; object-fit: cover; }
-    .avatar-degistir {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      background: rgba(0,0,0,.5);
-      color: #fff;
-      font-size: .6rem;
-      text-align: center;
-      padding: .2rem;
-    }
-    .profil-avatar:hover .avatar-degistir { opacity: 1; }
+    .avatar-degistir { position: absolute; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,.5); color: #fff; font-size: .6rem; text-align: center; padding: .2rem; }
     .avatar-input { display: none; }
-
     .profil-ad-alani { padding-top: .5rem; }
-    .profil-ad { font-size: 1.35rem; font-weight: 800; color: #1f2937; }
-    .profil-meta { font-size: .875rem; color: #6b7280; margin-top: .2rem; }
-
-    /* ── Sekmeler ─────────────────────────────────────────── */
-    .sekme-listesi {
-      display: flex;
-      border-bottom: 2px solid #e5e7eb;
-      margin-bottom: 1.5rem;
-      gap: 0;
-    }
+    .profil-ad { font-size: 1.35rem; font-weight: 800; color: var(--renk-yazi); }
+    .profil-meta { font-size: .875rem; color: var(--renk-yazi-ikincil); margin-top: .2rem; }
+    .sekme-listesi { display: flex; border-bottom: 2px solid var(--renk-kenar); margin-bottom: 1.5rem; }
     .sekme-btn {
-      padding: .875rem 1.25rem;
-      background: none;
-      border: none;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
-      font-size: .9rem;
-      font-weight: 600;
-      color: #6b7280;
-      cursor: pointer;
-      transition: color .2s, border-color .2s;
-      white-space: nowrap;
+      padding: .875rem 1.25rem; background: none; border: none;
+      border-bottom: 2px solid transparent; margin-bottom: -2px;
+      font-size: .9rem; font-weight: 600; color: var(--renk-yazi-ikincil);
+      cursor: pointer; transition: color .2s, border-color .2s; white-space: nowrap;
     }
     .sekme-btn:hover { color: var(--renk-birincil); }
-    .sekme-btn.aktif {
-      color: var(--renk-birincil);
-      border-bottom-color: var(--renk-birincil);
-    }
-
-    /* ── İlan listesi ─────────────────────────────────────── */
+    .sekme-btn.aktif { color: var(--renk-birincil); border-bottom-color: var(--renk-birincil); }
     .benim-ilan-listesi { display: flex; flex-direction: column; gap: .75rem; }
     .benim-ilan-item {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 14px;
-      padding: 1rem 1.25rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
+      background: var(--renk-kart); border: 1px solid var(--renk-kenar);
+      border-radius: 14px; padding: 1rem 1.25rem;
+      display: flex; align-items: center; gap: 1rem; transition: background .3s;
     }
     .benim-ilan-fotograf {
-      width: 72px; height: 56px;
-      border-radius: 8px;
-      background: #e0f2fe;
-      overflow: hidden;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
+      width: 72px; height: 56px; border-radius: 8px;
+      background: var(--renk-birincil-ac); overflow: hidden; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
     }
     .benim-ilan-fotograf img { width: 100%; height: 100%; object-fit: cover; }
     .benim-ilan-bilgi { flex: 1; min-width: 0; }
-    .benim-ilan-baslik {
-      font-size: .95rem;
-      font-weight: 600;
-      color: #1f2937;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: .2rem;
-    }
-    .benim-ilan-meta { font-size: .8rem; color: #6b7280; display: flex; gap: .875rem; flex-wrap: wrap; }
-    .durum-etiket {
-      display: inline-block;
-      padding: .15rem .6rem;
-      border-radius: 99px;
-      font-size: .75rem;
-      font-weight: 600;
-    }
-    .durum-aktif  { background: #dcfce7; color: #16a34a; }
-    .durum-pasif  { background: #f3f4f6; color: #6b7280; }
-    .benim-ilan-aksiyonlar {
-      display: flex;
-      gap: .5rem;
-      flex-shrink: 0;
-    }
-    .aksiyon-btn {
-      padding: .4rem .75rem;
-      border-radius: 8px;
-      font-size: .8rem;
-      font-weight: 600;
-      border: 1.5px solid;
-      cursor: pointer;
-      transition: background .2s;
-      background: none;
-    }
-    .aksiyon-goruntule { border-color: #e5e7eb; color: #374151; }
-    .aksiyon-goruntule:hover { background: #f9fafb; }
+    .benim-ilan-baslik { font-size: .95rem; font-weight: 600; color: var(--renk-yazi); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: .2rem; }
+    .benim-ilan-meta { font-size: .8rem; color: var(--renk-yazi-ikincil); display: flex; gap: .875rem; flex-wrap: wrap; }
+    .durum-etiket { display: inline-block; padding: .15rem .6rem; border-radius: 99px; font-size: .75rem; font-weight: 600; }
+    .durum-aktif { background: #dcfce7; color: #16a34a; }
+    .durum-pasif { background: var(--renk-kenar-ac); color: var(--renk-yazi-ikincil); }
+    .benim-ilan-aksiyonlar { display: flex; gap: .5rem; flex-shrink: 0; }
+    .aksiyon-btn { padding: .4rem .75rem; border-radius: 8px; font-size: .8rem; font-weight: 600; border: 1.5px solid; cursor: pointer; transition: background .2s; background: none; }
+    .aksiyon-goruntule { border-color: var(--renk-kenar); color: var(--renk-yazi); }
+    .aksiyon-goruntule:hover { background: var(--renk-kenar-ac); }
     .aksiyon-sil { border-color: #fecaca; color: #ef4444; }
     .aksiyon-sil:hover { background: #fef2f2; }
     .aksiyon-aktif { border-color: #bbf7d0; color: #16a34a; }
     .aksiyon-aktif:hover { background: #f0fdf4; }
-
-    /* ── Profil düzenleme formu ───────────────────────────── */
-    .profil-form {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 1.5rem;
-    }
-    .profil-form .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: .875rem;
-    }
+    .profil-form { background: var(--renk-kart); border: 1px solid var(--renk-kenar); border-radius: 16px; padding: 1.5rem; transition: background .3s; }
+    .profil-form .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: .875rem; }
     .profil-form .tam-satir { grid-column: 1 / -1; }
-
-    /* Şifre değiştir */
-    .sifre-bolum {
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 16px;
-      padding: 1.5rem;
-      margin-top: 1rem;
-    }
-    .sifre-bolum h3 { font-size: 1rem; font-weight: 700; color: #1f2937; margin-bottom: 1rem; }
-
+    .sifre-bolum { background: var(--renk-kart); border: 1px solid var(--renk-kenar); border-radius: 16px; padding: 1.5rem; margin-top: 1rem; transition: background .3s; }
+    .sifre-bolum h3 { font-size: 1rem; font-weight: 700; color: var(--renk-yazi); margin-bottom: 1rem; }
     @media (max-width: 600px) {
       .profil-form .form-grid { grid-template-columns: 1fr; }
       .benim-ilan-aksiyonlar { flex-direction: column; }
@@ -195,8 +85,6 @@
   </style>
 </head>
 <body>
-
-  <!-- NAVBAR -->
   <nav class="navbar">
     <div class="navbar-ic">
       <a href="/ilan-platformu/index.html" class="navbar-logo">🏠 İlan Platformu</a>
@@ -208,8 +96,6 @@
   </nav>
 
   <div class="profil-konteyner">
-
-    <!-- Profil kartı -->
     <div class="profil-kart">
       <div class="profil-banner"></div>
       <div class="profil-icerik">
@@ -227,16 +113,14 @@
       </div>
     </div>
 
-    <!-- Sekmeler -->
     <div class="sekme-listesi">
       <button class="sekme-btn aktif" data-sekme="ilanlarim">📋 İlanlarım</button>
       <button class="sekme-btn" data-sekme="duzenle">✏️ Profili Düzenle</button>
     </div>
 
-    <!-- İlanlarım -->
     <div id="sekme-ilanlarim">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
-        <h2 style="font-size:1rem;font-weight:700;color:#1f2937">İlanlarım</h2>
+        <h2 style="font-size:1rem;font-weight:700;color:var(--renk-yazi)">İlanlarım</h2>
         <a href="/ilan-platformu/ilan-ver.html" class="btn-birincil" style="font-size:.875rem;padding:.5rem 1rem">+ Yeni İlan</a>
       </div>
       <div class="benim-ilan-listesi" id="benim-ilan-listesi">
@@ -244,49 +128,27 @@
       </div>
     </div>
 
-    <!-- Profili Düzenle -->
     <div id="sekme-duzenle" style="display:none">
       <div class="profil-form">
         <div class="form-grid">
-          <div class="form-grup">
-            <label for="duz-ad">Ad Soyad</label>
-            <input type="text" id="duz-ad" placeholder="Ad Soyad" />
-          </div>
-          <div class="form-grup">
-            <label for="duz-telefon">Telefon</label>
-            <input type="tel" id="duz-telefon" placeholder="05XX XXX XX XX" />
-          </div>
-          <div class="form-grup">
-            <label for="duz-sehir">Şehir</label>
-            <input type="text" id="duz-sehir" placeholder="İstanbul" />
-          </div>
-          <div class="form-grup tam-satir">
-            <label for="duz-bio">Hakkımda</label>
-            <textarea id="duz-bio" rows="3" placeholder="Kendini kısaca tanıt..."></textarea>
-          </div>
+          <div class="form-grup"><label for="duz-ad">Ad Soyad</label><input type="text" id="duz-ad" placeholder="Ad Soyad" /></div>
+          <div class="form-grup"><label for="duz-telefon">Telefon</label><input type="tel" id="duz-telefon" placeholder="05XX XXX XX XX" /></div>
+          <div class="form-grup"><label for="duz-sehir">Şehir</label><input type="text" id="duz-sehir" placeholder="İstanbul" /></div>
+          <div class="form-grup tam-satir"><label for="duz-bio">Hakkımda</label><textarea id="duz-bio" rows="3" placeholder="Kendini kısaca tanıt..."></textarea></div>
         </div>
         <div style="display:flex;justify-content:flex-end;margin-top:.5rem">
           <button id="profil-kaydet-btn" class="btn-birincil">Kaydet</button>
         </div>
         <div id="profil-mesaj" class="auth-mesaj gizli"></div>
       </div>
-
-      <!-- Şifre değiştir -->
       <div class="sifre-bolum">
         <h3>🔒 Şifre Değiştir</h3>
-        <div class="form-grup">
-          <label for="yeni-sifre">Yeni Şifre</label>
-          <input type="password" id="yeni-sifre" placeholder="En az 6 karakter" />
-        </div>
-        <div class="form-grup">
-          <label for="yeni-sifre-tekrar">Şifre Tekrar</label>
-          <input type="password" id="yeni-sifre-tekrar" placeholder="Aynı şifreyi tekrar gir" />
-        </div>
+        <div class="form-grup"><label for="yeni-sifre">Yeni Şifre</label><input type="password" id="yeni-sifre" placeholder="En az 6 karakter" /></div>
+        <div class="form-grup"><label for="yeni-sifre-tekrar">Şifre Tekrar</label><input type="password" id="yeni-sifre-tekrar" placeholder="Aynı şifreyi tekrar gir" /></div>
         <button id="sifre-degistir-btn" class="btn-ikincil">Şifreyi Güncelle</button>
         <div id="sifre-mesaj" class="auth-mesaj gizli" style="margin-top:.75rem"></div>
       </div>
     </div>
-
   </div>
 
   <script type="module">
@@ -296,61 +158,43 @@
     import { mevcutKullanici, cikisYap }                from '/ilan-platformu/js/auth.js';
     import { toastBasari, toastHata, fiyatFormatla, tarihFormatla } from '/ilan-platformu/js/ui.js';
     import { supabase }                                 from '/ilan-platformu/js/config.js';
+    import { temaBaslat }                               from '/ilan-platformu/js/tema.js';
 
-    // Giriş kontrolü
+    temaBaslat();
+
     document.body.style.visibility = 'hidden';
     const kullanici = await mevcutKullanici();
-    if (!kullanici) {
-      window.location.replace('/ilan-platformu/giris.html?sonra=/ilan-platformu/profil.html');
-      throw new Error('Giriş gerekli');
-    }
+    if (!kullanici) { window.location.replace('/ilan-platformu/giris.html?sonra=/ilan-platformu/profil.html'); throw new Error('Giriş gerekli'); }
     document.body.style.visibility = 'visible';
 
     document.getElementById('cikis-btn').addEventListener('click', cikisYap);
 
-    // ── Profili yükle ────────────────────────────────────────
     let profil = await profilGetir(kullanici.id);
     profilGoster(profil);
 
     function profilGoster(p) {
       document.getElementById('profil-ad').textContent = p.ad_soyad ?? 'İsimsiz';
-      document.getElementById('profil-meta').textContent =
-        [p.sehir, p.telefon].filter(Boolean).join(' · ');
-
+      document.getElementById('profil-meta').textContent = [p.sehir, p.telefon].filter(Boolean).join(' · ');
       const avatarEl = document.getElementById('profil-avatar');
       if (p.avatar_url) {
-        avatarEl.innerHTML = `
-          <img src="${p.avatar_url}" alt="${p.ad_soyad}" />
-          <div class="avatar-degistir">Değiştir</div>
-          <input type="file" class="avatar-input" id="avatar-input" accept="image/jpeg,image/png,image/webp" />
-        `;
+        avatarEl.innerHTML = `<img src="${p.avatar_url}" alt="${p.ad_soyad}" /><div class="avatar-degistir">Değiştir</div><input type="file" class="avatar-input" id="avatar-input" accept="image/jpeg,image/png,image/webp" />`;
       } else {
-        document.getElementById('avatar-harf').textContent =
-          p.ad_soyad?.charAt(0)?.toUpperCase() ?? '?';
+        const harf = document.getElementById('avatar-harf');
+        if (harf) harf.textContent = p.ad_soyad?.charAt(0)?.toUpperCase() ?? '?';
       }
-
-      // Formu doldur
-      document.getElementById('duz-ad').value      = p.ad_soyad    ?? '';
-      document.getElementById('duz-telefon').value  = p.telefon     ?? '';
-      document.getElementById('duz-sehir').value    = p.sehir       ?? '';
-      document.getElementById('duz-bio').value      = p.bio         ?? '';
-
-      // Avatar tıklama
-      document.getElementById('profil-avatar').addEventListener('click', () => {
-        document.getElementById('avatar-input')?.click();
-      });
+      document.getElementById('duz-ad').value      = p.ad_soyad ?? '';
+      document.getElementById('duz-telefon').value = p.telefon  ?? '';
+      document.getElementById('duz-sehir').value   = p.sehir    ?? '';
+      document.getElementById('duz-bio').value     = p.bio      ?? '';
+      document.getElementById('profil-avatar').addEventListener('click', () => document.getElementById('avatar-input')?.click());
       document.getElementById('avatar-input')?.addEventListener('change', async (e) => {
         const dosya = e.target.files[0];
         if (!dosya) return;
-        try {
-          const url = await avatarYukle(kullanici.id, dosya);
-          toastBasari('Profil fotoğrafı güncellendi.');
-          profilGoster({ ...profil, avatar_url: url });
-        } catch(err) { toastHata(err.message); }
+        try { const url = await avatarYukle(kullanici.id, dosya); toastBasari('Profil fotoğrafı güncellendi.'); profilGoster({ ...profil, avatar_url: url }); }
+        catch(err) { toastHata(err.message); }
       });
     }
 
-    // ── Sekmeler ────────────────────────────────────────────
     document.querySelectorAll('.sekme-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.sekme-btn').forEach(b => b.classList.remove('aktif'));
@@ -361,20 +205,13 @@
       });
     });
 
-    // ── İlanları yükle ──────────────────────────────────────
     async function ilanlariYukle() {
       const liste = document.getElementById('benim-ilan-listesi');
       try {
         const ilanlar = await benimIlanlarim(kullanici.id);
         liste.innerHTML = '';
         if (ilanlar.length === 0) {
-          liste.innerHTML = `
-            <div class="bos-durum">
-              <div class="bos-durum-ikon">📋</div>
-              <h3>Henüz ilanın yok</h3>
-              <p>İlk ilanını vermek için aşağıdaki butona tıkla.</p>
-              <a href="/ilan-platformu/ilan-ver.html" class="btn-birincil" style="display:inline-flex;margin-top:1rem">+ İlan Ver</a>
-            </div>`;
+          liste.innerHTML = `<div class="bos-durum"><div class="bos-durum-ikon">📋</div><h3>Henüz ilanın yok</h3><p>İlk ilanını vermek için aşağıdaki butona tıkla.</p><a href="/ilan-platformu/ilan-ver.html" class="btn-birincil" style="display:inline-flex;margin-top:1rem">+ İlan Ver</a></div>`;
           return;
         }
         ilanlar.forEach(ilan => {
@@ -382,11 +219,7 @@
           const item = document.createElement('div');
           item.className = 'benim-ilan-item';
           item.innerHTML = `
-            <div class="benim-ilan-fotograf">
-              ${fotograf
-                ? `<img src="${fotograf}" alt="${ilan.baslik}" />`
-                : (ilan.kategoriler?.ikon ?? '📋')}
-            </div>
+            <div class="benim-ilan-fotograf">${fotograf ? `<img src="${fotograf}" alt="${ilan.baslik}" />` : (ilan.kategoriler?.ikon ?? '📋')}</div>
             <div class="benim-ilan-bilgi">
               <div class="benim-ilan-baslik">${ilan.baslik}</div>
               <div class="benim-ilan-meta">
@@ -396,50 +229,29 @@
                 <span>${tarihFormatla(ilan.created_at)}</span>
               </div>
               <div style="margin-top:.35rem">
-                <span class="durum-etiket ${ilan.durum === 'aktif' ? 'durum-aktif' : 'durum-pasif'}">
-                  ${ilan.durum === 'aktif' ? '✅ Aktif' : '⏸ Pasif'}
-                </span>
+                <span class="durum-etiket ${ilan.durum === 'aktif' ? 'durum-aktif' : 'durum-pasif'}">${ilan.durum === 'aktif' ? '✅ Aktif' : '⏸ Pasif'}</span>
               </div>
             </div>
             <div class="benim-ilan-aksiyonlar">
               <button class="aksiyon-btn aksiyon-goruntule" data-id="${ilan.id}" data-aksiyon="goruntule">Görüntüle</button>
-              ${ilan.durum === 'aktif'
-                ? `<button class="aksiyon-btn aksiyon-sil" data-id="${ilan.id}" data-aksiyon="pasif">Pasife Al</button>`
-                : `<button class="aksiyon-btn aksiyon-aktif" data-id="${ilan.id}" data-aksiyon="aktif">Aktif Et</button>`
-              }
+              ${ilan.durum === 'aktif' ? `<button class="aksiyon-btn aksiyon-sil" data-id="${ilan.id}" data-aksiyon="pasif">Pasife Al</button>` : `<button class="aksiyon-btn aksiyon-aktif" data-id="${ilan.id}" data-aksiyon="aktif">Aktif Et</button>`}
               <button class="aksiyon-btn aksiyon-sil" data-id="${ilan.id}" data-aksiyon="sil">Sil</button>
-            </div>
-          `;
+            </div>`;
           liste.appendChild(item);
         });
-
         liste.addEventListener('click', async (e) => {
           const btn = e.target.closest('[data-aksiyon]');
           if (!btn) return;
-          const id     = btn.dataset.id;
-          const aksiyon = btn.dataset.aksiyon;
-          if (aksiyon === 'goruntule') {
-            window.location.href = `ilan-detay.html?id=${id}`;
-          } else if (aksiyon === 'pasif') {
-            if (!confirm('İlanı pasife almak istediğine emin misin?')) return;
-            await ilanGuncelle(id, { durum: 'pasif' });
-            toastBasari('İlan pasife alındı.'); ilanlariYukle();
-          } else if (aksiyon === 'aktif') {
-            await ilanGuncelle(id, { durum: 'aktif' });
-            toastBasari('İlan aktif edildi.'); ilanlariYukle();
-          } else if (aksiyon === 'sil') {
-            if (!confirm('Bu ilanı silmek istediğine emin misin? Bu işlem geri alınamaz.')) return;
-            await ilanSil(id);
-            toastBasari('İlan silindi.'); ilanlariYukle();
-          }
+          const { id, aksiyon } = btn.dataset;
+          if (aksiyon === 'goruntule') { window.location.href = `/ilan-platformu/ilan-detay.html?id=${id}`; }
+          else if (aksiyon === 'pasif') { if (!confirm('İlanı pasife almak istediğine emin misin?')) return; await ilanGuncelle(id, { durum: 'pasif' }); toastBasari('İlan pasife alındı.'); ilanlariYukle(); }
+          else if (aksiyon === 'aktif') { await ilanGuncelle(id, { durum: 'aktif' }); toastBasari('İlan aktif edildi.'); ilanlariYukle(); }
+          else if (aksiyon === 'sil') { if (!confirm('Bu ilanı silmek istediğine emin misin?')) return; await ilanSil(id); toastBasari('İlan silindi.'); ilanlariYukle(); }
         });
-      } catch(e) {
-        liste.innerHTML = `<p style="color:#ef4444;font-size:.875rem">Yüklenemedi: ${e.message}</p>`;
-      }
+      } catch(e) { liste.innerHTML = `<p style="color:#ef4444;font-size:.875rem">Yüklenemedi: ${e.message}</p>`; }
     }
     ilanlariYukle();
 
-    // ── Profil kaydet ────────────────────────────────────────
     document.getElementById('profil-kaydet-btn').addEventListener('click', async () => {
       const btn = document.getElementById('profil-kaydet-btn');
       btn.disabled = true; btn.textContent = 'Kaydediliyor...';
@@ -448,48 +260,31 @@
         if (telefon && !telefonGecerliMi(telefon)) throw new Error('Geçersiz telefon numarası.');
         profil = await profilGuncelle(kullanici.id, {
           ad_soyad: metinTemizle(document.getElementById('duz-ad').value, 100),
-          telefon:  telefon,
-          sehir:    metinTemizle(document.getElementById('duz-sehir').value, 50),
-          bio:      metinTemizle(document.getElementById('duz-bio').value, 500),
+          telefon, sehir: metinTemizle(document.getElementById('duz-sehir').value, 50),
+          bio: metinTemizle(document.getElementById('duz-bio').value, 500),
         });
         profilGoster(profil);
         const mesajEl = document.getElementById('profil-mesaj');
         mesajEl.textContent = '✅ Profil güncellendi.';
         mesajEl.className = 'auth-mesaj basari';
         setTimeout(() => mesajEl.className = 'auth-mesaj gizli', 3000);
-      } catch(e) {
-        toastHata(e.message);
-      } finally {
-        btn.disabled = false; btn.textContent = 'Kaydet';
-      }
+      } catch(e) { toastHata(e.message); }
+      finally { btn.disabled = false; btn.textContent = 'Kaydet'; }
     });
 
-    // ── Şifre değiştir ───────────────────────────────────────
     document.getElementById('sifre-degistir-btn').addEventListener('click', async () => {
-      const sifre       = document.getElementById('yeni-sifre').value;
+      const sifre = document.getElementById('yeni-sifre').value;
       const sifreTekrar = document.getElementById('yeni-sifre-tekrar').value;
-      const mesajEl     = document.getElementById('sifre-mesaj');
-
-      if (sifre.length < 6) {
-        mesajEl.textContent = 'Şifre en az 6 karakter olmalı.';
-        mesajEl.className = 'auth-mesaj hata'; return;
-      }
-      if (sifre !== sifreTekrar) {
-        mesajEl.textContent = 'Şifreler eşleşmiyor.';
-        mesajEl.className = 'auth-mesaj hata'; return;
-      }
+      const mesajEl = document.getElementById('sifre-mesaj');
+      if (sifre.length < 6) { mesajEl.textContent = 'Şifre en az 6 karakter olmalı.'; mesajEl.className = 'auth-mesaj hata'; return; }
+      if (sifre !== sifreTekrar) { mesajEl.textContent = 'Şifreler eşleşmiyor.'; mesajEl.className = 'auth-mesaj hata'; return; }
       try {
         const { error } = await supabase.auth.updateUser({ password: sifre });
         if (error) throw error;
-        mesajEl.textContent = '✅ Şifre güncellendi.';
-        mesajEl.className = 'auth-mesaj basari';
-        document.getElementById('yeni-sifre').value = '';
-        document.getElementById('yeni-sifre-tekrar').value = '';
+        mesajEl.textContent = '✅ Şifre güncellendi.'; mesajEl.className = 'auth-mesaj basari';
+        document.getElementById('yeni-sifre').value = ''; document.getElementById('yeni-sifre-tekrar').value = '';
         setTimeout(() => mesajEl.className = 'auth-mesaj gizli', 3000);
-      } catch(e) {
-        mesajEl.textContent = e.message;
-        mesajEl.className = 'auth-mesaj hata';
-      }
+      } catch(e) { mesajEl.textContent = e.message; mesajEl.className = 'auth-mesaj hata'; }
     });
   </script>
 </body>
