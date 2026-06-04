@@ -2,6 +2,13 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    (function() {
+      const t = localStorage.getItem('tema-tercihi') ||
+        (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-tema', t);
+    })();
+  </script>
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' cdn.jsdelivr.net; connect-src https://*.supabase.co wss://*.supabase.co https://cdn.jsdelivr.net; img-src 'self' data: blob: https://*.supabase.co; style-src 'self' 'unsafe-inline'; font-src 'self' data:;">
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="strict-origin-when-cross-origin">
@@ -9,23 +16,26 @@
   <title>İlan Platformu — Hizmet ve Ürün İlanları</title>
   <link rel="stylesheet" href="/ilan-platformu/css/main.css" />
   <style>
-    /* ── Hero ──────────────────────────────────────────────── */
     .hero {
-      background: linear-gradient(135deg, #e0f2fe 0%, #faf9ff 60%, #e0f2fe 100%);
+      background: linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 60%, #e0f2fe 100%);
       padding: 3.5rem 1.5rem 2.5rem;
       text-align: center;
+      transition: background .3s;
+    }
+    [data-tema="dark"] .hero {
+      background: linear-gradient(135deg, #0c4a6e 0%, #0f172a 60%, #0c4a6e 100%);
     }
     .hero h1 {
       font-size: clamp(1.75rem, 4vw, 2.75rem);
       font-weight: 800;
-      color: #1f2937;
+      color: var(--renk-yazi);
       margin-bottom: .75rem;
       line-height: 1.2;
     }
     .hero h1 span { color: var(--renk-birincil); }
     .hero p {
       font-size: 1.1rem;
-      color: #6b7280;
+      color: var(--renk-yazi-ikincil);
       margin-bottom: 2rem;
     }
     .hero-arama {
@@ -37,12 +47,13 @@
     .hero-arama input {
       flex: 1;
       padding: .8rem 1.25rem;
-      border: 2px solid #e5e7eb;
+      border: 2px solid var(--renk-kenar);
       border-radius: 99px;
       font-size: 1rem;
       outline: none;
-      transition: border-color .2s;
-      background: #fff;
+      transition: border-color .2s, background .3s;
+      background: var(--renk-kart);
+      color: var(--renk-yazi);
     }
     .hero-arama input:focus { border-color: var(--renk-birincil); }
     .hero-arama button {
@@ -57,15 +68,15 @@
       transition: background .2s;
       white-space: nowrap;
     }
-    .hero-arama button:hover { background: #0284c7; }
+    .hero-arama button:hover { background: var(--renk-ikincil); }
 
-    /* ── Kategoriler ───────────────────────────────────────── */
     .kategoriler-bolum {
-      background: #fff;
-      border-bottom: 1px solid #e5e7eb;
+      background: var(--navbar-bg);
+      border-bottom: 1px solid var(--renk-kenar);
       position: sticky;
       top: 64px;
       z-index: 90;
+      transition: background .3s;
     }
     .kategoriler-ic {
       max-width: 1200px;
@@ -88,7 +99,7 @@
       border-bottom: 3px solid transparent;
       font-size: .9rem;
       font-weight: 600;
-      color: #6b7280;
+      color: var(--renk-yazi-ikincil);
       white-space: nowrap;
       cursor: pointer;
       transition: color .2s, border-color .2s;
@@ -100,14 +111,12 @@
     }
     .kategori-btn .ikon { font-size: 1.1rem; }
 
-    /* ── Ana içerik ────────────────────────────────────────── */
     .ana-icerik {
       max-width: 1200px;
       margin: 0 auto;
       padding: 2rem 1.5rem;
     }
 
-    /* ── Filtre çubuğu ─────────────────────────────────────── */
     .filtre-cubugu {
       display: flex;
       align-items: center;
@@ -117,29 +126,34 @@
     }
     .filtre-cubugu select {
       padding: .5rem .875rem;
-      border: 1.5px solid #e5e7eb;
+      border: 1.5px solid var(--renk-kenar);
       border-radius: 8px;
       font-size: .875rem;
-      color: #374151;
-      background: #fff;
+      color: var(--renk-yazi);
+      background: var(--renk-kart);
       cursor: pointer;
       outline: none;
+      transition: background .3s;
     }
     .filtre-cubugu select:focus { border-color: var(--renk-birincil); }
     .ilan-sayisi {
       margin-left: auto;
       font-size: .875rem;
-      color: #6b7280;
+      color: var(--renk-yazi-ikincil);
       font-weight: 500;
     }
 
-    /* ── Daha fazla yükle ──────────────────────────────────── */
     .daha-fazla-alani {
       text-align: center;
       margin-top: 2.5rem;
     }
 
-    /* ── Mobil ─────────────────────────────────────────────── */
+    /* Dropdown dark mode */
+    #nav-dropdown-menu {
+      background: var(--renk-kart) !important;
+      border-color: var(--renk-kenar) !important;
+    }
+
     @media (max-width: 768px) {
       .hero { padding: 2rem 1rem 1.75rem; }
       .hero-arama { flex-direction: column; }
@@ -169,11 +183,11 @@
         <div class="nav-kullanici gizli" id="nav-kullanici">
           <div class="nav-avatar" id="nav-avatar">?</div>
           <span id="nav-kullanici-ad"></span>
-          <div class="nav-dropdown" id="nav-dropdown-menu" style="display:none;position:absolute;top:56px;right:1.5rem;background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.1);padding:.5rem;min-width:160px;z-index:200;">
-            <a href="/ilan-platformu/profil.html" style="display:block;padding:.6rem .875rem;border-radius:8px;color:#374151;font-size:.9rem;text-decoration:none;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">👤 Profilim</a>
-            <a href="/ilan-platformu/mesajlar.html" style="display:block;padding:.6rem .875rem;border-radius:8px;color:#374151;font-size:.9rem;text-decoration:none;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">💬 Mesajlarım</a>
-            <hr style="border:none;border-top:1px solid #e5e7eb;margin:.25rem 0;" />
-            <button id="cikis-btn" style="display:block;width:100%;text-align:left;padding:.6rem .875rem;border-radius:8px;color:#ef4444;font-size:.9rem;background:none;border:none;cursor:pointer;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background='none'">🚪 Çıkış Yap</button>
+          <div class="nav-dropdown" id="nav-dropdown-menu" style="display:none;position:absolute;top:56px;right:1.5rem;border:1px solid;border-radius:12px;box-shadow:0 4px 16px rgba(0,0,0,.15);padding:.5rem;min-width:160px;z-index:200;">
+            <a href="/ilan-platformu/profil.html" style="display:block;padding:.6rem .875rem;border-radius:8px;color:var(--renk-yazi);font-size:.9rem;text-decoration:none;">👤 Profilim</a>
+            <a href="/ilan-platformu/mesajlar.html" style="display:block;padding:.6rem .875rem;border-radius:8px;color:var(--renk-yazi);font-size:.9rem;text-decoration:none;">💬 Mesajlarım</a>
+            <hr style="border:none;border-top:1px solid var(--renk-kenar);margin:.25rem 0;" />
+            <button id="cikis-btn" style="display:block;width:100%;text-align:left;padding:.6rem .875rem;border-radius:8px;color:#ef4444;font-size:.9rem;background:none;border:none;cursor:pointer;">🚪 Çıkış Yap</button>
           </div>
         </div>
       </div>
@@ -196,7 +210,6 @@
       <button class="kategori-btn aktif" data-slug="">
         <span class="ikon">🏠</span> Tümü
       </button>
-      <!-- JS ile doldurulacak -->
     </div>
   </div>
 
@@ -228,8 +241,10 @@
     import { ilanlariGetir, kategorileriGetir, sehirleriGetir } from '/ilan-platformu/js/ilanlar.js';
     import { navbarGuncelle, cikisYap }                         from '/ilan-platformu/js/auth.js';
     import { ilanKartHTML, bosDurumGoster }                     from '/ilan-platformu/js/ui.js';
+    import { temaBaslat }                                        from '/ilan-platformu/js/tema.js';
 
-    // Durum
+    temaBaslat();
+
     let aktifKategori = '';
     let aktifSehir    = '';
     let aktifArama    = '';
@@ -238,10 +253,8 @@
     const LIMIT       = 20;
     let yukleniyor    = false;
 
-    // Navbar
     navbarGuncelle();
 
-    // Dropdown toggle
     const navKullanici = document.getElementById('nav-kullanici');
     const dropdownMenu = document.getElementById('nav-dropdown-menu');
     navKullanici?.addEventListener('click', () => {
@@ -253,7 +266,6 @@
     });
     document.getElementById('cikis-btn')?.addEventListener('click', cikisYap);
 
-    // ── Kategorileri yükle ──────────────────────────────────
     async function kategorileriYukle() {
       const kategoriler = await kategorileriGetir();
       const liste = document.getElementById('kategoriler-listesi');
@@ -275,7 +287,6 @@
       });
     }
 
-    // ── Şehirleri yükle ─────────────────────────────────────
     async function sehirleriYukle() {
       const sehirler = await sehirleriGetir();
       const select = document.getElementById('sehir-filtre');
@@ -286,47 +297,32 @@
       });
     }
 
-    // ── İlanları yükle ──────────────────────────────────────
     async function ilanlariYukle(sifirla = false) {
       if (yukleniyor) return;
       yukleniyor = true;
-
       const izgara = document.getElementById('ilan-izgarasi');
-      if (sifirla) {
-        izgara.innerHTML = '<div class="yukleniyor-spinner"></div>';
-        offset = 0;
-      }
-
+      if (sifirla) { izgara.innerHTML = '<div class="yukleniyor-spinner"></div>'; offset = 0; }
       try {
         const ilanlar = await ilanlariGetir({
           kategoriSlug: aktifKategori || null,
-          sehir:        aktifSehir    || null,
-          arama:        aktifArama    || null,
-          sirala:       aktifSirala,
-          limit:        LIMIT,
-          offset
+          sehir: aktifSehir || null,
+          arama: aktifArama || null,
+          sirala: aktifSirala,
+          limit: LIMIT, offset
         });
-
         if (sifirla) izgara.innerHTML = '';
-
         if (ilanlar.length === 0 && sifirla) {
           bosDurumGoster('ilan-izgarasi', {
-            ikon: '🔍',
-            baslik: 'İlan bulunamadı',
+            ikon: '🔍', baslik: 'İlan bulunamadı',
             aciklama: 'Farklı bir arama veya kategori deneyin.',
-            btnMetin: 'İlan Ver',
-            btnHref: 'ilan-ver.html'
+            btnMetin: 'İlan Ver', btnHref: '/ilan-platformu/ilan-ver.html'
           });
           document.getElementById('ilan-sayisi').textContent = '';
         } else {
-          ilanlar.forEach(ilan => {
-            izgara.insertAdjacentHTML('beforeend', ilanKartHTML(ilan));
-          });
+          ilanlar.forEach(ilan => izgara.insertAdjacentHTML('beforeend', ilanKartHTML(ilan)));
           offset += ilanlar.length;
-          const sayiEl = document.getElementById('ilan-sayisi');
-          sayiEl.textContent = offset > 0 ? `${offset} ilan gösteriliyor` : '';
-          document.getElementById('daha-fazla-alani').style.display =
-            ilanlar.length === LIMIT ? 'block' : 'none';
+          document.getElementById('ilan-sayisi').textContent = offset > 0 ? `${offset} ilan gösteriliyor` : '';
+          document.getElementById('daha-fazla-alani').style.display = ilanlar.length === LIMIT ? 'block' : 'none';
         }
       } catch (e) {
         console.error(e);
@@ -336,7 +332,6 @@
       }
     }
 
-    // ── Arama ────────────────────────────────────────────────
     function aramaYap() {
       aktifArama = document.getElementById('hero-arama').value.trim()
                 || document.getElementById('navbar-arama').value.trim();
@@ -347,24 +342,10 @@
     document.getElementById('hero-arama').addEventListener('keydown', e => { if (e.key === 'Enter') aramaYap(); });
     document.getElementById('navbar-arama').addEventListener('keydown', e => { if (e.key === 'Enter') aramaYap(); });
 
-    // ── Filtreler ────────────────────────────────────────────
-    document.getElementById('sehir-filtre').addEventListener('change', e => {
-      aktifSehir = e.target.value;
-      offset = 0;
-      ilanlariYukle(true);
-    });
-    document.getElementById('sirala-filtre').addEventListener('change', e => {
-      aktifSirala = e.target.value;
-      offset = 0;
-      ilanlariYukle(true);
-    });
+    document.getElementById('sehir-filtre').addEventListener('change', e => { aktifSehir = e.target.value; offset = 0; ilanlariYukle(true); });
+    document.getElementById('sirala-filtre').addEventListener('change', e => { aktifSirala = e.target.value; offset = 0; ilanlariYukle(true); });
+    document.getElementById('daha-fazla-btn').addEventListener('click', () => ilanlariYukle(false));
 
-    // ── Daha fazla ───────────────────────────────────────────
-    document.getElementById('daha-fazla-btn').addEventListener('click', () => {
-      ilanlariYukle(false);
-    });
-
-    // ── Başlat ───────────────────────────────────────────────
     kategorileriYukle();
     sehirleriYukle();
     ilanlariYukle(true);
