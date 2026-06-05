@@ -45,25 +45,26 @@
     <!-- Kayıt formu -->
     <div id="kayit-formu" class="auth-form gizli">
       <div class="form-grup">
-        <label for="kayit-ad">Ad Soyad</label>
+        <label for="kayit-ad">Ad Soyad <span style="color:#ef4444">*</span></label>
         <input type="text" id="kayit-ad" placeholder="Ad Soyad" />
       </div>
       <div class="form-grup">
-        <label for="kayit-email">E-posta</label>
+        <label for="kayit-email">E-posta <span style="color:#ef4444">*</span></label>
         <input type="email" id="kayit-email" placeholder="ornek@mail.com" />
       </div>
       <div class="form-grup">
-        <label for="kayit-telefon">Telefon</label>
+        <label for="kayit-telefon">Telefon <span style="color:#9ca3af;font-size:.8rem">(opsiyonel)</span></label>
         <input type="tel" id="kayit-telefon" placeholder="05XX XXX XX XX" />
       </div>
       <div class="form-grup">
-        <label for="kayit-sehir">Şehir</label>
+        <label for="kayit-sehir">Şehir <span style="color:#9ca3af;font-size:.8rem">(opsiyonel)</span></label>
         <input type="text" id="kayit-sehir" placeholder="İstanbul" />
       </div>
       <div class="form-grup">
-        <label for="kayit-sifre">Şifre</label>
+        <label for="kayit-sifre">Şifre <span style="color:#ef4444">*</span></label>
         <input type="password" id="kayit-sifre" placeholder="En az 6 karakter" />
       </div>
+      <p style="font-size:.75rem;color:var(--renk-yazi-uc);margin-bottom:.75rem"><span style="color:#ef4444">*</span> zorunlu alan</p>
       <button id="kayit-btn" class="btn-birincil tam">Kayıt Ol</button>
     </div>
 
