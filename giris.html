@@ -209,7 +209,7 @@
       try {
         yukleniyorAyarla('kayit-btn', true);
         await kayitOl({ email, sifre, adSoyad, telefon, sehir });
-        mesajGoster('Kaydınız alındı! E-postanızı onaylayın.', 'basari');
+        mesajGoster('Kaydınız alındı! Lütfen e-postanızı onaylayın.', 'basari');
       } catch (e) {
         mesajGoster(hataMetni(e), 'hata');
       } finally {
