@@ -8,7 +8,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Giriş Yap — İlan Platformu</title>
   <script>
-    // Tema titreşimini önle — CSS yüklenmeden önce çalışır
     (function() {
       const t = localStorage.getItem('tema-tercihi') ||
         (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -22,13 +21,11 @@
   <div class="auth-kart">
     <a href="/ilan-platformu/index.html" class="auth-logo">🏠 İlan Platformu</a>
 
-    <!-- Sekme -->
     <div class="auth-sekmeler">
       <button class="sekme aktif" data-sekme="giris">Giriş Yap</button>
       <button class="sekme" data-sekme="kayit">Kayıt Ol</button>
     </div>
 
-    <!-- Giriş formu -->
     <div id="giris-formu" class="auth-form">
       <div class="form-grup">
         <label for="giris-email">E-posta</label>
@@ -42,7 +39,6 @@
       <button id="sifre-sifirla-btn" class="btn-link">Şifremi unuttum</button>
     </div>
 
-    <!-- Kayıt formu -->
     <div id="kayit-formu" class="auth-form gizli">
       <div class="form-grup">
         <label for="kayit-ad">Ad Soyad <span style="color:#ef4444">*</span></label>
@@ -64,18 +60,19 @@
         <label for="kayit-sifre">Şifre <span style="color:#ef4444">*</span></label>
         <input type="password" id="kayit-sifre" placeholder="En az 6 karakter" />
       </div>
-      <p style="font-size:.75rem;color:var(--renk-yazi-uc);margin-bottom:.75rem"><span style="color:#ef4444">*</span> zorunlu alan</p>
+      <p style="font-size:.75rem;color:var(--renk-yazi-uc);margin-bottom:.75rem">
+        <span style="color:#ef4444">*</span> zorunlu alan
+      </p>
       <button id="kayit-btn" class="btn-birincil tam">Kayıt Ol</button>
     </div>
 
     <div id="auth-mesaj" class="auth-mesaj gizli"></div>
 
-    <!-- Şifre sıfırlama formu (reset linkten gelince gösterilir) -->
     <div id="sifre-guncelle-formu" class="auth-form gizli">
       <div style="text-align:center;margin-bottom:1.25rem">
         <div style="font-size:2rem;margin-bottom:.5rem">🔒</div>
-        <h2 style="font-size:1.1rem;font-weight:700;color:#1f2937">Yeni Şifre Belirle</h2>
-        <p style="font-size:.875rem;color:#6b7280;margin-top:.25rem">Lütfen yeni şifrenizi girin.</p>
+        <h2 style="font-size:1.1rem;font-weight:700;color:var(--renk-yazi)">Yeni Şifre Belirle</h2>
+        <p style="font-size:.875rem;color:var(--renk-yazi-ikincil);margin-top:.25rem">Lütfen yeni şifrenizi girin.</p>
       </div>
       <div class="form-grup">
         <label for="yeni-sifre">Yeni Şifre</label>
@@ -91,34 +88,50 @@
 
   <script type="module">
     import { girisYap, kayitOl, sifreSifirla, sifreGuncelle, mevcutKullanici } from '/ilan-platformu/js/auth.js';
-    import { temaBaslat } from '/ilan-platformu/js/tema.js';
-    temaBaslat();
-    import { supabase } from '/ilan-platformu/js/config.js';
+    import { temaBaslat }    from '/ilan-platformu/js/tema.js';
+    import { supabase }      from '/ilan-platformu/js/config.js';
     import { kayitDogrula, epostaGecerliMi, istemciRateLimit } from '/ilan-platformu/js/validation.js';
 
-    // ── Şifre sıfırlama modu kontrolü ──────────────────────
+    temaBaslat();
+
+    // Hash'ten tip bilgisini al
+    const hash        = window.location.hash;
+    const recoveryMod = hash.includes('type=recovery');
+
+    // Şifre sıfırlama modunda formu hemen göster
+    if (recoveryMod) {
+      document.querySelector('.auth-sekmeler').style.display = 'none';
+      document.getElementById('giris-formu').classList.add('gizli');
+      document.getElementById('sifre-guncelle-formu').classList.remove('gizli');
+    }
+
+    // Auth olaylarını dinle
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
+        // Şifre sıfırlama linki
         document.querySelector('.auth-sekmeler').style.display = 'none';
         document.getElementById('giris-formu').classList.add('gizli');
         document.getElementById('kayit-formu').classList.add('gizli');
         document.getElementById('sifre-guncelle-formu').classList.remove('gizli');
-      } else if (event === 'SIGNED_IN' && !document.getElementById('sifre-guncelle-formu').classList.contains('gizli') === false) {
-        window.location.href = '/ilan-platformu/index.html';
+      } else if (event === 'SIGNED_IN' && session) {
+        // E-posta onayından sonra veya normal girişten sonra yönlendir
+        // Şifre sıfırlama modundaysa yönlendirme
+        if (!recoveryMod) {
+          window.location.href = '/ilan-platformu/index.html';
+        }
       }
     });
 
-    // URL hash'te recovery token varsa formu hemen göster
-    if (window.location.hash.includes('type=recovery')) {
-      document.querySelector('.auth-sekmeler').style.display = 'none';
-      document.getElementById('giris-formu').classList.add('gizli');
-      document.getElementById('kayit-formu').classList.add('gizli');
-      document.getElementById('sifre-guncelle-formu').classList.remove('gizli');
+    // Zaten oturum varsa yönlendir (şifre sıfırlama hariç)
+    if (!recoveryMod) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) window.location.href = '/ilan-platformu/index.html';
+      });
     }
 
-    // Şifre güncelle butonu
+    // Şifre güncelle
     document.getElementById('sifre-guncelle-btn').addEventListener('click', async () => {
-      const yeniSifre       = document.getElementById('yeni-sifre').value;
+      const yeniSifre = document.getElementById('yeni-sifre').value;
       const yeniSifreTekrar = document.getElementById('yeni-sifre-tekrar').value;
       if (yeniSifre.length < 6) return mesajGoster('Şifre en az 6 karakter olmalı.', 'hata');
       if (yeniSifre !== yeniSifreTekrar) return mesajGoster('Şifreler eşleşmiyor.', 'hata');
@@ -135,13 +148,6 @@
       }
     });
 
-    // Zaten giriş yapmışsa ana sayfaya yönlendir
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session && !window.location.hash.includes('type=recovery')) {
-        window.location.href = '/ilan-platformu/index.html';
-      }
-    });
-
     // Sekme geçişi
     document.querySelectorAll('.sekme').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -154,24 +160,19 @@
       });
     });
 
-    // ── Enter tuşu desteği ──────────────────────────────────
-    // Giriş formunda tüm alanlarda Enter = giriş yap
+    // Enter tuşu
     ['giris-email', 'giris-sifre'].forEach(id => {
-      document.getElementById(id).addEventListener('keydown', (e) => {
+      document.getElementById(id).addEventListener('keydown', e => {
         if (e.key === 'Enter') document.getElementById('giris-btn').click();
       });
     });
-
-    // Kayıt formunda tüm alanlarda Enter = kayıt ol
     ['kayit-ad', 'kayit-email', 'kayit-telefon', 'kayit-sehir', 'kayit-sifre'].forEach(id => {
-      document.getElementById(id).addEventListener('keydown', (e) => {
+      document.getElementById(id).addEventListener('keydown', e => {
         if (e.key === 'Enter') document.getElementById('kayit-btn').click();
       });
     });
-
-    // Yeni şifre formunda Enter = güncelle
     ['yeni-sifre', 'yeni-sifre-tekrar'].forEach(id => {
-      document.getElementById(id).addEventListener('keydown', (e) => {
+      document.getElementById(id).addEventListener('keydown', e => {
         if (e.key === 'Enter') document.getElementById('sifre-guncelle-btn').click();
       });
     });
