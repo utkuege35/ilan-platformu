@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    const hash = window.location.hash;
+    if (hash.includes('access_token') || hash.includes('type=')) {
+      window.location.href = '/ilan-platformu/giris.html' + hash;
+    } else {
+      window.location.href = '/ilan-platformu/index.html';
+    }
+  </script>
+</head>
+<body></body>
+</html>
