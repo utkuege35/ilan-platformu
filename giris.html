@@ -98,6 +98,31 @@
     const hash        = window.location.hash;
     const recoveryMod = hash.includes('type=recovery');
 
+    // E-posta onay token'ını işle (ConfirmationURL formatı: ?token_hash=xxx&type=signup)
+    const params     = new URLSearchParams(window.location.search);
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const tokenHash  = params.get('token_hash') || hashParams.get('token_hash');
+    const tokenType  = params.get('type') || hashParams.get('type');
+
+    if (tokenHash && tokenType === 'signup') {
+      // Sekmeleri gizle, bekleme mesajı göster
+      document.querySelector('.auth-sekmeler').style.display = 'none';
+      document.getElementById('giris-formu').classList.add('gizli');
+      mesajGoster('E-posta adresiniz doğrulanıyor...', 'basari');
+
+      supabase.auth.verifyOtp({ token_hash: tokenHash, type: 'signup' })
+        .then(({ error }) => {
+          if (error) {
+            mesajGoster('Onay bağlantısı geçersiz veya süresi dolmuş. Lütfen tekrar kayıt olun.', 'hata');
+            document.querySelector('.auth-sekmeler').style.display = '';
+            document.getElementById('giris-formu').classList.remove('gizli');
+          } else {
+            mesajGoster('✅ E-posta adresiniz onaylandı! Yönlendiriliyorsunuz...', 'basari');
+            setTimeout(() => window.location.href = '/ilan-platformu/index.html', 2000);
+          }
+        });
+    }
+
     // Şifre sıfırlama modunda formu hemen göster
     if (recoveryMod) {
       document.querySelector('.auth-sekmeler').style.display = 'none';
@@ -108,22 +133,19 @@
     // Auth olaylarını dinle
     supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'PASSWORD_RECOVERY') {
-        // Şifre sıfırlama linki
         document.querySelector('.auth-sekmeler').style.display = 'none';
         document.getElementById('giris-formu').classList.add('gizli');
         document.getElementById('kayit-formu').classList.add('gizli');
         document.getElementById('sifre-guncelle-formu').classList.remove('gizli');
       } else if (event === 'SIGNED_IN' && session) {
-        // E-posta onayından sonra veya normal girişten sonra yönlendir
-        // Şifre sıfırlama modundaysa yönlendirme
-        if (!recoveryMod) {
+        if (!recoveryMod && !tokenHash) {
           window.location.href = '/ilan-platformu/index.html';
         }
       }
     });
 
-    // Zaten oturum varsa yönlendir (şifre sıfırlama hariç)
-    if (!recoveryMod) {
+    // Zaten oturum varsa yönlendir (şifre sıfırlama ve onay hariç)
+    if (!recoveryMod && !tokenHash) {
       supabase.auth.getSession().then(({ data: { session } }) => {
         if (session) window.location.href = '/ilan-platformu/index.html';
       });
